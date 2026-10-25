@@ -320,10 +320,18 @@ function useSource(newSource) {
   }
 }
 
+// Phones and tablets can't drop files or press Ctrl+V, so they get shorter instructions.
+const touchScreen = matchMedia('(hover: none) and (pointer: coarse)').matches;
+
+function bold(text) {
+  const element = document.createElement('strong');
+  element.textContent = text;
+  return element;
+}
+
 function showLoadedFile(name) {
-  const fileName = document.createElement('strong');
-  fileName.textContent = name;
-  ui.drop.replaceChildren(fileName, ' is loaded. Choose another, drop one here, or paste with Ctrl+V');
+  const instructions = touchScreen ? 'Tap to choose another.' : 'Choose another, drop one here, or paste with Ctrl+V';
+  ui.drop.replaceChildren(bold(name), ' is loaded. ' + instructions);
   ui.drop.classList.add('loaded');
 }
 
@@ -640,5 +648,6 @@ ui.copy.addEventListener('click', async () => {
   }
 });
 
+if (touchScreen) ui.drop.replaceChildren(bold('Tap to choose an image'));
 ui.smoothing.closest('.field').hidden = !subpixelTextSupported();
 randomizePadding();
