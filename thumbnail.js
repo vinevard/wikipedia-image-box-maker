@@ -181,7 +181,7 @@ function thumbnailPixels(pixels, width, height) {
 
 // Chrome refuses to start a worker from a script file on file://, so the worker is built from this file's own functions.
 // They are serialized with String(), so they must stay self-contained: every helper and constant they use must be
-// listed or declared here.
+// listed or declared here. A missing one shows up as a console error and a fallback to the main thread.
 const thumbnailWorkerUrl = URL.createObjectURL(new Blob([[
   `const SHARPEN_SIGMA = ${SHARPEN_SIGMA}, SHARPEN_AMOUNT = ${SHARPEN_AMOUNT};`,
   ...[lanczos3, resampleWeights, resize, boxReduce, clampIndex, gaussianWeights, blurRows, blurColumnAt,
@@ -189,15 +189,12 @@ const thumbnailWorkerUrl = URL.createObjectURL(new Blob([[
   'onmessage = ({ data }) => { const pixels = thumbnailPixels(data.pixels, data.width, data.height); postMessage(pixels, [pixels.data.buffer]); };',
 ].join('\n')], { type: 'text/javascript' }));
 
-function thumbnailPixelsOnMainThread(pixels, width, height) {
-  try {
-    return Promise.resolve(thumbnailPixels(pixels, width, height));
-  } catch (error) {
-    return Promise.reject(error);
-  }
+async function thumbnailPixelsOnMainThread(pixels, width, height) {
+  return thumbnailPixels(pixels, width, height);
 }
 
 function thumbnailPixelsOffMainThread(pixels, width, height, signal) {
+  if (signal.aborted) return Promise.reject(signal.reason);
   let worker;
   try {
     worker = new Worker(thumbnailWorkerUrl);
@@ -218,8 +215,9 @@ function thumbnailPixelsOffMainThread(pixels, width, height, signal) {
       stop();
       resolve(e.data);
     };
-    worker.onerror = () => {
+    worker.onerror = e => {
       stop();
+      console.error('Thumbnail worker failed, using the main thread:', e.message);
       resolve(thumbnailPixelsOnMainThread(pixels, width, height));
     };
     worker.postMessage({ pixels, width, height });

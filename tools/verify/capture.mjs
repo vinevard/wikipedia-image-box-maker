@@ -56,6 +56,9 @@ let lastId = 0;
 const pending = new Map();
 socket.addEventListener('message', event => {
   const message = JSON.parse(event.data);
+  if (message.method === 'Runtime.consoleAPICalled' && message.params.type === 'error') {
+    console.error('console error:', message.params.args.map(arg => arg.value ?? arg.description).join(' '));
+  }
   pending.get(message.id)?.(message.result);
   pending.delete(message.id);
 });
@@ -67,6 +70,7 @@ const send = (method, params = {}) => new Promise(resolve => {
 let status = 0;
 try {
   await send('Page.enable');
+  await send('Runtime.enable');
   await send('Page.navigate', { url });
   const deadline = Date.now() + timeout;
   let title = '';
