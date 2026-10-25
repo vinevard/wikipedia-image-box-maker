@@ -320,13 +320,23 @@ function useSource(newSource) {
   }
 }
 
+function showLoadedFile(name) {
+  const fileName = document.createElement('strong');
+  fileName.textContent = name;
+  ui.drop.replaceChildren(fileName, ' is loaded. Choose another, drop one here, or paste with Ctrl+V');
+  ui.drop.classList.add('loaded');
+}
+
 async function loadFile(file) {
   if (!file || !file.type.startsWith('image/')) return;
   const id = ++loadId;
   const url = URL.createObjectURL(file);
   try {
     const image = await loadImage(url);
-    if (id === loadId) return useSource({ image, pixels: readPixels(image), type: file.type });
+    if (id === loadId) {
+      showLoadedFile(file.name);
+      return useSource({ image, pixels: readPixels(image), type: file.type });
+    }
   } catch {
     if (id === loadId) setStatus('Could not read that image.');
   }

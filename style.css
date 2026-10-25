@@ -18,7 +18,8 @@ h2 { font-size: 1.5em; margin: 1em 0 .5em; }
 .settings { font-size: 14px; line-height: 1.6; }
 .settings [hidden] { display: none; }
 @media (max-width: 760px) {
-  .layout { grid-template-columns: minmax(0, 1fr); }
+  .layout { grid-template-columns: minmax(0, 1fr); gap: 0; }
+  .preview { order: -1; }
   main { padding-left: 16px; padding-right: 16px; }
 }
 
@@ -61,6 +62,7 @@ code { background: var(--bg-subtle); border: 1px solid #eaecf0; border-radius: 2
   text-align: center; color: var(--muted); background: var(--bg-subtle); cursor: pointer;
 }
 .drop.over { border-color: var(--link); color: var(--link); background: #eaf3ff; }
+.drop.loaded { border-style: solid; color: var(--text); overflow-wrap: anywhere; }
 
 .preview { overflow-x: auto; padding: 4px 2px 2px; }
 .shot { width: max-content; background: #fff; outline: 1px dashed var(--border); }
