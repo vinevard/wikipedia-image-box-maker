@@ -1,0 +1,20 @@
+[
+  { "slug": "well", "wiki": "en", "article": "Well", "file": "Old-fashioned_well_in_Finland.JPG",
+    "shows": "Default 250px thumbnail in the Small text size most readers get" },
+  { "slug": "barn-raising", "wiki": "en", "article": "Barn_raising", "file": "Barn_Raising_DeKalb_County_IN.jpg",
+    "shows": "A 300px figure: Wikipedia loads its 330px file, and the original (586px) stands in for the 2x file because it's smaller than the next size up" },
+  { "slug": "lighthouse", "wiki": "en", "article": "Lighthouse", "file": "Point_Danger_lighthouse.jpg",
+    "shows": "A tall image shown at 150px, which still loads 250px and 330px files and lets the browser scale them" },
+  { "slug": "cornell-box", "wiki": "en", "article": "Radiosity_(computer_graphics)", "file": "BMRT_-_Cornell_box,_with_and_without_radiosity.gif", "animated": true,
+    "shows": "A square image from an animated GIF; the tool uses the first frame, so the Wikipedia side is captured on that frame" },
+  { "slug": "haymakers", "wiki": "en", "article": "Hay", "file": "George_Stubbs_-_Haymaking_-_WGA21948.jpg", "textSize": 16,
+    "shows": "Standard text size, and an italic link in the caption" },
+  { "slug": "carnegie-library", "wiki": "en", "article": "Carnegie_library", "file": "Carnegie_Library_Pittsburgh_SSide_branch_early_days.jpg", "textSize": 20,
+    "shows": "Large text size with a caption that wraps to three lines" },
+  { "slug": "rooftop-farm", "wiki": "en", "article": "Community_gardening", "file": "Farm_above_Atré_Ebisu.jpg", "theme": "night",
+    "shows": "Dark mode, including Wikipedia's 80% brightness on photos" },
+  { "slug": "allotment", "wiki": "en", "site": "mobile", "article": "Allotment_(gardening)", "file": "Kauswagan_Allotment_Garden.JPG",
+    "shows": "The mobile site on a 390px phone: no frame, grey caption, different font" },
+  { "slug": "community-garden-he", "wiki": "he", "article": "גינה_קהילתית", "file": "HerbalPatch_Lippensgoed_Bulskampveld.jpg", "direction": "rtl",
+    "shows": "Right-to-left, from Hebrew Wikipedia: mirrored icon, caption aligned right" }
+]

@@ -1,0 +1,172 @@
+:root {
+  --text: #202122;
+  --muted: #54595d;
+  --link: #36c;
+  --border: #a2a9b1;
+  --bg-subtle: #f8f9fa;
+  --serif: 'Linux Libertine', 'Georgia', 'Times', serif;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: #fff; color: var(--text); font-family: sans-serif; }
+
+main { max-width: 1000px; margin: 0 auto; padding: 24px 24px 48px; }
+h1, h2 { font-family: var(--serif); font-weight: normal; border-bottom: 1px solid var(--border); margin: 0; }
+h1 { font-size: 1.8em; padding-bottom: 2px; }
+h2 { font-size: 1.5em; margin: 1em 0 .5em; }
+.tagline { color: var(--muted); font-size: .875em; margin: 6px 0 0; }
+.layout { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 32px; align-items: start; }
+.settings { font-size: 14px; line-height: 1.6; }
+.settings [hidden] { display: none; }
+@media (max-width: 760px) {
+  .layout { grid-template-columns: minmax(0, 1fr); }
+  main { padding-left: 16px; padding-right: 16px; }
+}
+
+.field { display: block; margin: 0 0 14px; }
+fieldset.field { min-width: 0; padding: 0; border: 0; }
+legend.field-title { padding: 0; }
+.field-title { display: block; font-weight: bold; margin-bottom: 4px; }
+input[type=number], textarea, select {
+  font: inherit; color: var(--text); background: #fff; width: 100%;
+  border: 1px solid var(--border); border-radius: 2px; padding: 5px 8px;
+}
+textarea { resize: vertical; min-height: 56px; }
+input:focus, textarea:focus, select:focus { outline: none; border-color: var(--link); box-shadow: inset 0 0 0 1px var(--link); }
+.row { display: flex; gap: 10px; align-items: center; }
+.row input[type=range] { flex: 1; accent-color: var(--link); }
+.row input[type=number] { width: 80px; }
+.hint { color: var(--muted); font-size: 12.5px; margin: 4px 0 0; }
+code { background: var(--bg-subtle); border: 1px solid #eaecf0; border-radius: 2px; padding: 0 3px; font-size: 12px; }
+.check { display: flex; gap: 6px; align-items: center; margin: 0 0 14px; }
+.check input { accent-color: var(--link); }
+.sides { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.sides label { font-size: 12.5px; color: var(--muted); }
+.sides input { margin-top: 2px; }
+.inline-controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 8px 0; }
+.inline-controls input[type=number] { width: 64px; }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+#status { color: var(--muted); font-size: 12.5px; }
+
+.btn {
+  font: inherit; font-weight: bold; cursor: pointer; min-height: 32px; padding: 5px 12px;
+  border: 1px solid var(--border); border-radius: 2px; background: var(--bg-subtle); color: var(--text);
+}
+.btn:hover:not(:disabled) { background: #fff; }
+.btn.primary { background: var(--link); border-color: var(--link); color: #fff; }
+.btn.primary:hover:not(:disabled) { background: #3056a9; }
+.btn:disabled { cursor: default; background: #c8ccd1; border-color: #c8ccd1; color: #fff; }
+
+.drop {
+  border: 1px dashed var(--border); border-radius: 2px; padding: 14px; margin-bottom: 14px;
+  text-align: center; color: var(--muted); background: var(--bg-subtle); cursor: pointer;
+}
+.drop.over { border-color: var(--link); color: var(--link); background: #eaf3ff; }
+
+.preview { overflow-x: auto; padding: 4px 2px 2px; }
+.shot { width: max-content; background: #fff; outline: 1px dashed var(--border); }
+.export-layout { position: fixed; left: 0; top: 0; visibility: hidden; }
+
+/* Recreates Wikipedia's Vector 2022 thumbnail. .page stands in for the article body, and restores
+   content-box sizing because the table layout below is sized from it. */
+.page, .page *, .page *::before, .page *::after { box-sizing: content-box; }
+.page { font-family: sans-serif; font-size: 14px; line-height: 1.5714285; color: #202122; }
+.page a { color: #36c; text-decoration: none; }
+
+/* The figure is a table and the caption a table-caption below it: the figure draws the top and sides of
+   the frame, the caption draws the sides and bottom, and together they look like one box. */
+.thumb {
+  display: table;
+  border-collapse: collapse;
+  line-height: 0;
+  min-width: 100px;
+  margin: 0;
+  text-align: center;
+  border: 1px solid #c8ccd1;
+  border-bottom: 0;
+  background-color: #f8f9fa;
+  color: #202122;
+}
+.thumb-link { display: block; position: relative; }
+/* The 8px are the image's 3px margins and 1px borders on both sides. At fractional zoom levels borders round
+   down to one device pixel, the frame's inside gets narrower than the image, and this cap shrinks the image the
+   same way Wikipedia's responsive rule does. */
+.thumb-image {
+  height: auto;
+  max-width: calc(100% - 8px);
+  margin: 3px;
+  vertical-align: middle;
+  background-color: #fff;
+  border: 1px solid #c8ccd1;
+}
+.thumb-caption {
+  display: table-caption;
+  caption-side: bottom;
+  background-color: inherit;
+  line-height: 1.4em;
+  font-size: 88.4%;
+  text-align: start;
+  word-break: break-word;
+  padding: 0 6px 6px 6px;
+  border: 1px solid #c8ccd1;
+  border-top: 0;
+}
+.thumb-caption:empty { padding-bottom: 3px; }
+
+/* The enlarge icon hangs from the bottom of the image; a same-sized float keeps caption text clear of it.
+   Both sit at the end of the line, so right-to-left wikis show them on the left. app.js sets the
+   --enlarge-icon-* images from the same data URLs the export draws. */
+.thumb-link::after {
+  content: '';
+  position: absolute;
+  inset-inline-end: 6px;
+  bottom: -11px;
+  width: 15px;
+  height: 11px;
+  background-image: var(--enlarge-icon-ltr);
+}
+.page[dir=rtl] .thumb-link::after { background-image: var(--enlarge-icon-rtl); }
+.thumb-caption::before {
+  content: '';
+  float: inline-end;
+  width: 15px;
+  height: 11px;
+  margin-inline-start: 3px;
+}
+.thumb.no-icon .thumb-link::after,
+.thumb.no-icon .thumb-caption::before { content: none; }
+
+/* Vector 2022's Night theme. Wikipedia also dims photos in it. */
+.shot.night { background-color: #101418; }
+.night .page a { color: #88a3e8; }
+.night .thumb { border-color: #54595d; background-color: #202122; color: #eaecf0; }
+.night .thumb-image { border-color: #54595d; filter: brightness(0.8); }
+.night .thumb-caption { border-color: #54595d; }
+.night .thumb-link::after { filter: invert(1); }
+
+/* Recreates the mobile site's (Minerva) thumbnail: no frame and no enlarge icon, just the image and a grey caption.
+   .page.mobile stands in for the phone's content column; its max-width shrinks wider images to fit. */
+.page.mobile {
+  font-family: -apple-system, 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Inter', 'Helvetica', 'Arial', sans-serif;
+  font-size: 16px;
+  line-height: 1.65;
+  overflow-wrap: break-word;
+}
+.mobile .thumb { min-width: 0; line-height: inherit; text-align: start; border: 0; background-color: transparent; }
+.mobile .thumb-link { display: inline; position: static; }
+.mobile .thumb-image { max-width: 100%; margin: 0; border: 0; background-color: transparent; }
+.mobile .thumb-caption {
+  margin-top: 0.5em;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #54595d;
+  word-break: normal;
+  padding: 0;
+  border: 0;
+}
+.mobile .thumb-link::after,
+.mobile .thumb-caption::before { content: none; }
+
+/* The mobile site's Night theme keeps the dimmed photo but gives captions its subtle grey. */
+.night .mobile .thumb-caption { color: #a2a9b1; }
+
+.placeholder { display: inline-grid; place-items: center; color: #72777d; font-size: 13px; line-height: 1.4; }

@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wikipedia Image Box Maker</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main>
+  <h1>Wikipedia image box maker</h1>
+  <p class="tagline">Turn any picture and caption into what looks like a screenshot of a Wikipedia image box.</p>
+
+  <div class="layout">
+    <section class="settings">
+      <h2>Settings</h2>
+
+      <div class="drop" id="drop" role="button" tabindex="0">
+        <strong>Choose an image</strong>, drop one here, or paste with Ctrl+V
+      </div>
+      <input type="file" id="file" accept="image/*" hidden>
+
+      <div class="field">
+        <label class="field-title" for="caption">Caption</label>
+        <textarea id="caption">An example [[caption]] with a link</textarea>
+        <p class="hint">Markup: <code>[[link]]</code>, <code>[[target|shown text]]</code>, <code>''italic''</code>, <code>'''bold'''</code></p>
+      </div>
+
+      <div class="field">
+        <label class="field-title" for="site">Site</label>
+        <select id="site">
+          <option value="desktop" selected>Desktop (en.wikipedia.org)</option>
+          <option value="mobile">Mobile (en.m.wikipedia.org)</option>
+        </select>
+      </div>
+
+      <div class="field" hidden>
+        <label class="field-title" for="phoneWidth">Phone screen width</label>
+        <select id="phoneWidth">
+          <option value="360">360px (most Android phones)</option>
+          <option value="375">375px (iPhone SE, mini)</option>
+          <option value="390" selected>390px (iPhone 12 to 14)</option>
+          <option value="393">393px (iPhone 15, 16)</option>
+          <option value="412">412px (Pixel, larger Android phones)</option>
+          <option value="430">430px (iPhone Plus, Pro Max)</option>
+        </select>
+        <p class="hint">The mobile site shrinks images that are wider than the screen minus its 16px side margins.</p>
+      </div>
+
+      <div class="field">
+        <label class="field-title" for="width">Image width (px)</label>
+        <div class="row">
+          <input type="range" id="widthRange" min="100" max="600" value="250">
+          <input type="number" id="width" min="50" max="1200" value="250">
+        </div>
+        <p class="hint">Wikipedia's default thumbnail is 250px. Your photo is resized and sharpened the same way Wikipedia does it.</p>
+      </div>
+
+      <div class="field">
+        <label class="field-title" for="textSize">Text size</label>
+        <select id="textSize">
+          <option value="14" selected>Small (Wikipedia's default)</option>
+          <option value="16">Standard</option>
+          <option value="20">Large</option>
+        </select>
+        <p class="hint">Matches the Text setting in Wikipedia's Appearance menu.</p>
+      </div>
+
+      <div class="field">
+        <label class="field-title" for="theme">Theme</label>
+        <select id="theme">
+          <option value="day" selected>Light</option>
+          <option value="night">Dark</option>
+        </select>
+        <p class="hint">Matches the Color setting in Wikipedia's Appearance menu.</p>
+      </div>
+
+      <div class="field">
+        <label class="field-title" for="direction">Direction</label>
+        <select id="direction">
+          <option value="ltr" selected>Left-to-right</option>
+          <option value="rtl">Right-to-left</option>
+        </select>
+        <p class="hint">Right-to-left looks like Wikipedia in Hebrew, Arabic or Persian.</p>
+      </div>
+
+      <label class="check"><input type="checkbox" id="showIcon" checked> Show the enlarge icon</label>
+
+      <fieldset class="field">
+        <legend class="field-title">White space around the box (px in the downloaded image)</legend>
+        <div class="sides">
+          <label>Top<input type="number" id="padTop" min="0" max="500" value="10"></label>
+          <label>Right<input type="number" id="padRight" min="0" max="500" value="10"></label>
+          <label>Bottom<input type="number" id="padBottom" min="0" max="500" value="10"></label>
+          <label>Left<input type="number" id="padLeft" min="0" max="500" value="10"></label>
+        </div>
+        <div class="inline-controls">
+          <button class="btn" id="randomize" type="button">Randomize</button>
+          <span>around</span>
+          <input type="number" id="padBase" min="0" max="500" value="10" aria-label="Average space (px)">
+          <span>px, give or take</span>
+          <input type="number" id="padVariation" min="0" max="100" value="50" aria-label="Variation (%)">
+          <span>%</span>
+        </div>        <label class="check"><input type="checkbox" id="autoRandomize" checked> Randomize again for each new image</label>
+      </fieldset>
+
+      <div class="field">
+        <label class="field-title" for="scale">Download size</label>
+        <select id="scale">
+          <option value="1">1× (exact pixels)</option>
+          <option value="2" selected>2× (sharp)</option>
+          <option value="3">3× (extra sharp)</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label class="field-title" for="smoothing">Text smoothing</label>
+        <select id="smoothing">
+          <option value="grayscale" selected>Grayscale</option>
+          <option value="subpixel">Sub-pixel (like Windows screenshots)</option>
+        </select>
+      </div>
+
+      <div class="actions">
+        <button class="btn primary" id="download" disabled>Download PNG</button>
+        <button class="btn" id="copy" disabled>Copy image</button>
+        <span id="status" role="status" aria-live="polite"></span>
+      </div>
+    </section>
+
+    <section class="preview">
+      <h2>Preview</h2>
+      <div class="shot" id="shot">
+        <div class="page" id="page">
+          <figure class="thumb" id="thumb">
+            <a class="thumb-link" id="thumbLink"></a>
+            <figcaption class="thumb-caption" id="thumbCaption"></figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+<script src="thumbnail.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
