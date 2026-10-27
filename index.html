@@ -12,9 +12,10 @@
   <p class="tagline">Turn any picture and caption into what looks like a screenshot of a Wikipedia image box.</p>
 
   <div class="layout">
-    <section class="settings">
+    <form class="settings" id="settings">
       <h2>Settings</h2>
 
+      <h3>Image and caption</h3>
       <div class="drop" id="drop" role="button" tabindex="0">
         <strong>Choose an image</strong>, drop one here, or paste with Ctrl+V
       </div>
@@ -26,6 +27,7 @@
         <p class="hint">Markup: <code>[[link]]</code>, <code>[[target|shown text]]</code>, <code>''italic''</code>, <code>'''bold'''</code></p>
       </div>
 
+      <h3>Appearance</h3>
       <div class="field">
         <label class="field-title" for="site">Site</label>
         <select id="site">
@@ -56,24 +58,24 @@
         <p class="hint">Wikipedia's default thumbnail is 250px. Your photo is resized and sharpened the same way Wikipedia does it.</p>
       </div>
 
-      <div class="field">
-        <label class="field-title" for="textSize">Text size</label>
-        <select id="textSize">
-          <option value="14" selected>Small (Wikipedia's default)</option>
-          <option value="16">Standard</option>
-          <option value="20">Large</option>
-        </select>
-        <p class="hint">Matches the Text setting in Wikipedia's Appearance menu.</p>
-      </div>
+      <fieldset class="field">
+        <legend class="field-title">Text size</legend>
+        <div class="choices">
+          <label class="check"><input type="radio" name="textSize" value="14" checked> Small</label>
+          <label class="check"><input type="radio" name="textSize" value="16"> Standard</label>
+          <label class="check"><input type="radio" name="textSize" value="20"> Large</label>
+        </div>
+        <p class="hint">Matches the Text setting in Wikipedia's Appearance menu. Small is Wikipedia's default.</p>
+      </fieldset>
 
-      <div class="field">
-        <label class="field-title" for="theme">Theme</label>
-        <select id="theme">
-          <option value="day" selected>Light</option>
-          <option value="night">Dark</option>
-        </select>
+      <fieldset class="field">
+        <legend class="field-title">Theme</legend>
+        <div class="choices">
+          <label class="check"><input type="radio" name="theme" value="day" checked> Light</label>
+          <label class="check"><input type="radio" name="theme" value="night"> Dark</label>
+        </div>
         <p class="hint">Matches the Color setting in Wikipedia's Appearance menu.</p>
-      </div>
+      </fieldset>
 
       <div class="field">
         <label class="field-title" for="direction">Direction</label>
@@ -89,6 +91,7 @@
         <p class="hint">The small two-box icon under the corner of the image. On Wikipedia it opens the full-size image.</p>
       </div>
 
+      <h3>Download</h3>
       <fieldset class="field">
         <legend class="field-title">White space</legend>
         <label class="check"><input type="checkbox" id="whiteSpace" checked> Add white space around the box</label>
@@ -129,13 +132,8 @@
         </select>
       </div>
 
-      <div class="actions">
-        <button class="btn primary" id="download" disabled>Download PNG</button>
-        <button class="btn" id="copy" disabled>Copy image</button>
-        <button class="btn" id="reset" type="button">Reset settings</button>
-        <span id="status" role="status" aria-live="polite"></span>
-      </div>
-    </section>
+      <button class="btn" id="resetSettings" type="button">Reset settings</button>
+    </form>
 
     <section class="preview">
       <h2>Preview</h2>
@@ -146,6 +144,11 @@
             <figcaption class="thumb-caption" id="thumbCaption"></figcaption>
           </figure>
         </div>
+      </div>
+      <div class="actions">
+        <button class="btn primary" id="download" type="button" disabled>Download PNG</button>
+        <button class="btn" id="copy" type="button" disabled>Copy image</button>
+        <span id="status" role="status" aria-live="polite"></span>
       </div>
     </section>
   </div>

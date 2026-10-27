@@ -20,13 +20,15 @@ for (const [direction, url] of Object.entries(ENLARGE_ICONS)) {
 }
 
 const $ = id => document.getElementById(id);
+const settingsForm = $('settings');
 const ui = {
   drop: $('drop'), file: $('file'), caption: $('caption'), width: $('width'), widthRange: $('widthRange'),
-  site: $('site'), phoneWidth: $('phoneWidth'), textSize: $('textSize'), theme: $('theme'), direction: $('direction'),
+  site: $('site'), phoneWidth: $('phoneWidth'), direction: $('direction'),
+  textSize: settingsForm.elements.textSize, theme: settingsForm.elements.theme,
   showIcon: $('showIcon'), scale: $('scale'), smoothing: $('smoothing'),
   whiteSpace: $('whiteSpace'), whiteSpaceOptions: $('whiteSpaceOptions'),
   randomize: $('randomize'), padBase: $('padBase'), padVariation: $('padVariation'), autoRandomize: $('autoRandomize'),
-  download: $('download'), copy: $('copy'), reset: $('reset'), status: $('status'),
+  download: $('download'), copy: $('copy'), reset: $('resetSettings'), status: $('status'),
   shot: $('shot'), page: $('page'), thumb: $('thumb'), thumbLink: $('thumbLink'), thumbCaption: $('thumbCaption'),
 };
 const PADDING_SIDES = ['top', 'right', 'bottom', 'left'];
@@ -145,7 +147,7 @@ function renderImage(width, height) {
 
 function showSiteSettings(mobile) {
   ui.phoneWidth.closest('.field').hidden = !mobile;
-  ui.textSize.closest('.field').hidden = mobile;
+  ui.textSize[0].closest('.field').hidden = mobile;
   ui.showIcon.closest('.check').hidden = mobile;
 }
 
@@ -384,7 +386,7 @@ document.addEventListener('paste', e => {
 });
 
 for (const input of [ui.caption, ...paddingInputs]) input.addEventListener('input', render);
-for (const input of [ui.site, ui.phoneWidth, ui.showIcon, ui.whiteSpace, ui.textSize, ui.theme, ui.direction, ui.scale]) {
+for (const input of [ui.site, ui.phoneWidth, ui.showIcon, ui.whiteSpace, ...ui.textSize, ...ui.theme, ui.direction, ui.scale]) {
   input.addEventListener('change', render);
 }
 function syncWidth(e) {
@@ -652,18 +654,23 @@ ui.copy.addEventListener('click', async () => {
 });
 
 const SETTINGS_KEY = 'wikipedia-image-box-maker-settings';
-const savedControls = [
-  ui.caption, ui.site, ui.phoneWidth, ui.width, ui.textSize, ui.theme, ui.direction, ui.showIcon,
-  ui.whiteSpace, ...paddingInputs, ui.padBase, ui.padVariation, ui.autoRandomize, ui.scale, ui.smoothing,
+// Form control names or ids. A radio group's name gives a RadioNodeList, whose value is the checked radio's.
+const SAVED_SETTINGS = [
+  'caption', 'site', 'phoneWidth', 'width', 'textSize', 'theme', 'direction', 'showIcon', 'whiteSpace',
+  'padTop', 'padRight', 'padBottom', 'padLeft', 'padBase', 'padVariation', 'autoRandomize', 'scale', 'smoothing',
 ];
 
 function saveSettings() {
-  const settings = Object.fromEntries(savedControls.map(c => [c.id, c.type === 'checkbox' ? c.checked : c.value]));
+  const settings = Object.fromEntries(SAVED_SETTINGS.map(name => {
+    const control = settingsForm.elements[name];
+    return [name, control.type === 'checkbox' ? control.checked : control.value];
+  }));
   try {
     localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
   } catch {}
 }
 
+// Setting a RadioNodeList to a value that no radio has leaves it unchanged, but a select would show nothing.
 function restoreControl(control, value) {
   if (control.type === 'checkbox') {
     if (typeof value === 'boolean') control.checked = value;
@@ -678,18 +685,13 @@ function restoreSettings() {
     settings = JSON.parse(localStorage.getItem(SETTINGS_KEY));
   } catch {}
   if (settings && typeof settings === 'object') {
-    for (const control of savedControls) restoreControl(control, settings[control.id]);
+    for (const name of SAVED_SETTINGS) restoreControl(settingsForm.elements[name], settings[name]);
   }
   ui.widthRange.value = ui.width.value;
 }
 
 function resetSettings() {
-  for (const control of savedControls) {
-    if (control.type === 'checkbox') control.checked = control.defaultChecked;
-    else if (control.tagName === 'SELECT') control.selectedIndex = Math.max(0, [...control.options].findIndex(o => o.defaultSelected));
-    else control.value = control.defaultValue;
-  }
-  ui.widthRange.value = ui.width.value;
+  settingsForm.reset();
   try {
     localStorage.removeItem(SETTINGS_KEY);
   } catch {}
@@ -699,10 +701,8 @@ function resetSettings() {
 
 // Only user edits are saved, so tools/verify/hook.js, which sets the controls from code, leaves no settings behind
 // for the next case.
-for (const control of savedControls) {
-  control.addEventListener('input', saveSettings);
-  control.addEventListener('change', saveSettings);
-}
+settingsForm.addEventListener('input', saveSettings);
+settingsForm.addEventListener('change', saveSettings);
 ui.randomize.addEventListener('click', saveSettings);
 ui.reset.addEventListener('click', resetSettings);
 

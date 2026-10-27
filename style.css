@@ -13,6 +13,8 @@ main { max-width: 1000px; margin: 0 auto; padding: 24px 24px 48px; }
 h1, h2 { font-family: var(--serif); font-weight: normal; border-bottom: 1px solid var(--border); margin: 0; }
 h1 { font-size: 1.8em; padding-bottom: 2px; }
 h2 { font-size: 1.5em; margin: 1em 0 .5em; }
+h3 { font-size: 1.2em; margin: 22px 0 8px; }
+h2 + h3 { margin-top: 0; }
 .tagline { color: var(--muted); font-size: .875em; margin: 6px 0 0; }
 .layout { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 32px; align-items: start; }
 .settings { font-size: 14px; line-height: 1.6; }
@@ -40,6 +42,8 @@ input:focus, textarea:focus, select:focus { outline: none; border-color: var(--l
 code { background: var(--bg-subtle); border: 1px solid #eaecf0; border-radius: 2px; padding: 0 3px; font-size: 12px; }
 .check { display: flex; gap: 6px; align-items: center; margin: 0 0 14px; }
 .check input { accent-color: var(--link); }
+.choices { display: flex; flex-wrap: wrap; gap: 4px 20px; }
+.choices .check { margin: 0; }
 .field > .check:has(+ .hint) { margin-bottom: 0; }
 fieldset .check { margin-bottom: 8px; }
 .white-space-options { border-inline-start: 2px solid #eaecf0; padding-inline-start: 12px; }
@@ -49,7 +53,7 @@ fieldset .check { margin-bottom: 8px; }
 .sides input { margin-top: 2px; }
 .inline-controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 8px 0; }
 .inline-controls input[type=number] { width: 64px; }
-.actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 12px; }
 #status { color: var(--muted); font-size: 12.5px; }
 
 .btn {
