@@ -19,14 +19,14 @@ this tool, with the same photo and caption.
 | --- | --- |
 | Caption | Text with links, italic and bold. Refer to [Caption markup](#caption-markup). |
 | Site | Desktop, or mobile at a phone width that you select |
-| Image width | Any width. The Wikipedia default is 250px. |
+| Image width | 50px to 600px. The Wikipedia default is 250px. |
 | Text size | Small, Standard or Large, as in the Wikipedia Appearance menu |
 | Theme | Light or Dark. The Dark theme makes the photo darker, as on Wikipedia. |
 | Direction | Left-to-right, or right-to-left as in the Hebrew, Arabic and Persian Wikipedias |
 | Enlarge icon | On or off |
 | White space | Off, a value for each side, or random values. The default is 10px plus or minus 50%. The top usually gets less space than the bottom. |
 | Download size | 1x, 2x or 3x. The result does not change with the pixel density of your screen. |
-| Text smoothing | Grayscale, or sub-pixel as in Windows screenshots |
+| Text smoothing | Grayscale, or sub-pixel as in Windows screenshots. The default is sub-pixel if your browser can make sub-pixel text. |
 
 Transparent areas of an image show white, as on Wikipedia.
 

@@ -30,7 +30,7 @@ const ui = {
   whiteSpace: $('whiteSpace'), whiteSpaceOptions: $('whiteSpaceOptions'),
   randomize: $('randomize'), padBase: $('padBase'), padVariation: $('padVariation'), autoRandomize: $('autoRandomize'),
   download: $('download'), copy: $('copy'), reset: $('resetSettings'), status: $('status'),
-  shot: $('shot'), page: $('page'), thumb: $('thumb'), thumbLink: $('thumbLink'), thumbCaption: $('thumbCaption'),
+  shot: $('shot'), previewScale: $('previewScale'), page: $('page'), thumb: $('thumb'), thumbLink: $('thumbLink'), thumbCaption: $('thumbCaption'),
 };
 const PADDING_SIDES = ['top', 'right', 'bottom', 'left'];
 const paddingInputs = ['padTop', 'padRight', 'padBottom', 'padLeft'].map($);
@@ -38,6 +38,9 @@ const PHONE_SIDE_MARGIN = 16;
 const PLACEHOLDER_ASPECT = 0.75;
 const THUMBNAIL_DELAY_MS = 200;
 const STATUS_TIMEOUT_MS = 2500;
+const SHOT_OUTLINE = 1;
+// Matches the single-column layout in style.css.
+const narrowScreen = matchMedia('(max-width: 760px)');
 const FILE_NAME_SLUG_LENGTH = 60;
 const CAPTION_MARKUP = /\[\[([^\]|]+)(?:\|([^\]]*))?\]\]|'''(.+?)'''|''(.+?)''/g;
 
@@ -173,7 +176,30 @@ function render() {
   ui.thumbCaption.replaceChildren(parseCaption(ui.caption.value));
   ui.whiteSpaceOptions.hidden = !ui.whiteSpace.checked;
   ui.shot.style.padding = padding().map(p => p / scale + 'px').join(' ');
+  fitPreview();
   updateActions();
+}
+
+// The export lays out its own copy and sets its own zoom on it, so scaling the preview does not change the
+// download. Only the caption's font size is read from the preview, by unzoomedCaptionFontSize.
+function fitPreview() {
+  ui.shot.style.zoom = '';
+  const preview = ui.shot.parentElement;
+  const style = getComputedStyle(preview);
+  const room = preview.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight) - 2 * SHOT_OUTLINE;
+  const fit = narrowScreen.matches ? Math.min(1, room / ui.shot.getBoundingClientRect().width) : 1;
+  if (fit < 1) ui.shot.style.zoom = fit;
+  ui.previewScale.hidden = fit === 1;
+  ui.previewScale.textContent = `Shown at ${Math.floor(fit * 100)}% to fit your screen. The download keeps its full size.`;
+}
+
+// Firefox rounds a zoomed font size differently, so the fit-to-screen zoom is taken off while reading it.
+function unzoomedCaptionFontSize() {
+  const zoom = ui.shot.style.zoom;
+  ui.shot.style.zoom = '';
+  const size = getComputedStyle(ui.thumbCaption).fontSize;
+  ui.shot.style.zoom = zoom;
+  return size;
 }
 
 // Hand-cropped screenshots usually have less space above the box than below it. Squaring a random number keeps
@@ -398,6 +424,11 @@ function syncWidth(e) {
 }
 ui.width.addEventListener('input', syncWidth);
 ui.widthRange.addEventListener('input', syncWidth);
+// Typing can go past the range or leave the box empty. When the typing ends, the box shows the width in use.
+ui.width.addEventListener('change', () => {
+  ui.width.value = ui.widthRange.value = imageWidth();
+  render();
+});
 ui.widthReset.addEventListener('click', () => {
   ui.width.value = ui.widthRange.value = ui.width.defaultValue;
   render();
@@ -405,6 +436,7 @@ ui.widthReset.addEventListener('click', () => {
   saveSettings();
 });
 ui.randomize.addEventListener('click', randomizePadding);
+addEventListener('resize', fitPreview);
 
 // Safari only supports canvas filters behind a flag, so the CSS filters the preview uses are applied by hand.
 function colorFilter(filter) {
@@ -480,7 +512,7 @@ function exportLayout(zoom, imageUrl) {
   shot.style.zoom = zoom;
   // A denser screen rounds the caption's 88.4% font size before scaling it, but Firefox's zoom rounds after,
   // so the copy keeps the preview's already rounded size.
-  shot.querySelector('.thumb-caption').style.fontSize = getComputedStyle(ui.thumbCaption).fontSize;
+  shot.querySelector('.thumb-caption').style.fontSize = unzoomedCaptionFontSize();
   // With height: auto the box is sized from whichever file is loaded (the 2x file can be half a pixel shorter).
   const img = shot.querySelector('img');
   img.replaceWith(exportImage(img, imageUrl));
@@ -695,7 +727,7 @@ function restoreSettings() {
   if (settings && typeof settings === 'object') {
     for (const name of SAVED_SETTINGS) restoreControl(settingsForm.elements[name], settings[name]);
   }
-  ui.widthRange.value = ui.width.value;
+  ui.width.value = ui.widthRange.value = imageWidth();
 }
 
 function resetSettings() {
@@ -715,7 +747,9 @@ ui.randomize.addEventListener('click', saveSettings);
 ui.reset.addEventListener('click', resetSettings);
 
 if (touchScreen) ui.drop.replaceChildren(bold('Tap to choose an image'));
-ui.smoothing.closest('.field').hidden = !subpixelTextSupported();
+// Where the browser can draw sub-pixel text, real screenshots from the same computer usually have it too.
+if (subpixelTextSupported()) ui.smoothing.querySelector('[value=subpixel]').defaultSelected = true;
+else ui.smoothing.closest('.more').hidden = true;
 restoreSettings();
 if (ui.autoRandomize.checked) randomizePadding();
 else render();
