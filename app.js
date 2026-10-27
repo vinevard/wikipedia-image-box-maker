@@ -24,6 +24,7 @@ const ui = {
   drop: $('drop'), file: $('file'), caption: $('caption'), width: $('width'), widthRange: $('widthRange'),
   site: $('site'), phoneWidth: $('phoneWidth'), textSize: $('textSize'), theme: $('theme'), direction: $('direction'),
   showIcon: $('showIcon'), scale: $('scale'), smoothing: $('smoothing'),
+  whiteSpace: $('whiteSpace'), whiteSpaceOptions: $('whiteSpaceOptions'),
   randomize: $('randomize'), padBase: $('padBase'), padVariation: $('padVariation'), autoRandomize: $('autoRandomize'),
   download: $('download'), copy: $('copy'), reset: $('reset'), status: $('status'),
   shot: $('shot'), page: $('page'), thumb: $('thumb'), thumbLink: $('thumbLink'), thumbCaption: $('thumbCaption'),
@@ -88,6 +89,7 @@ function thumbnailFileHeight(source, width) {
 }
 
 function padding() {
+  if (!ui.whiteSpace.checked) return [0, 0, 0, 0];
   return paddingInputs.map(input => Math.max(0, Math.round(Number(input.value)) || 0));
 }
 
@@ -165,6 +167,7 @@ function render() {
   renderImage(width, imageHeight(source, width));
   ui.thumb.classList.toggle('no-icon', !ui.showIcon.checked);
   ui.thumbCaption.replaceChildren(parseCaption(ui.caption.value));
+  ui.whiteSpaceOptions.hidden = !ui.whiteSpace.checked;
   ui.shot.style.padding = padding().map(p => p / scale + 'px').join(' ');
   updateActions();
 }
@@ -381,7 +384,7 @@ document.addEventListener('paste', e => {
 });
 
 for (const input of [ui.caption, ...paddingInputs]) input.addEventListener('input', render);
-for (const input of [ui.site, ui.phoneWidth, ui.showIcon, ui.textSize, ui.theme, ui.direction, ui.scale]) {
+for (const input of [ui.site, ui.phoneWidth, ui.showIcon, ui.whiteSpace, ui.textSize, ui.theme, ui.direction, ui.scale]) {
   input.addEventListener('change', render);
 }
 function syncWidth(e) {
@@ -651,7 +654,7 @@ ui.copy.addEventListener('click', async () => {
 const SETTINGS_KEY = 'wikipedia-image-box-maker-settings';
 const savedControls = [
   ui.caption, ui.site, ui.phoneWidth, ui.width, ui.textSize, ui.theme, ui.direction, ui.showIcon,
-  ...paddingInputs, ui.padBase, ui.padVariation, ui.autoRandomize, ui.scale, ui.smoothing,
+  ui.whiteSpace, ...paddingInputs, ui.padBase, ui.padVariation, ui.autoRandomize, ui.scale, ui.smoothing,
 ];
 
 function saveSettings() {

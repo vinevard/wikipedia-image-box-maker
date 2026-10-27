@@ -24,7 +24,7 @@ this tool, with the same photo and caption.
 | Theme | Light or Dark. The Dark theme makes the photo darker, as on Wikipedia. |
 | Direction | Left-to-right, or right-to-left as in the Hebrew, Arabic and Persian Wikipedias |
 | Enlarge icon | On or off |
-| White space | A value for each side, or random values. The default is 10px plus or minus 50%. The top usually gets less space than the bottom. |
+| White space | Off, a value for each side, or random values. The default is 10px plus or minus 50%. The top usually gets less space than the bottom. |
 | Download size | 1x, 2x or 3x. The result does not change with the pixel density of your screen. |
 | Text smoothing | Grayscale, or sub-pixel as in Windows screenshots |
 

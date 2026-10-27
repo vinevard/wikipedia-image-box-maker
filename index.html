@@ -84,24 +84,32 @@
         <p class="hint">Right-to-left looks like Wikipedia in Hebrew, Arabic or Persian.</p>
       </div>
 
-      <label class="check"><input type="checkbox" id="showIcon" checked> Show the enlarge icon</label>
+      <div class="field">
+        <label class="check"><input type="checkbox" id="showIcon" checked> Show the enlarge icon</label>
+        <p class="hint">The small two-box icon under the corner of the image. On Wikipedia it opens the full-size image.</p>
+      </div>
 
       <fieldset class="field">
-        <legend class="field-title">White space around the box (px in the downloaded image)</legend>
-        <div class="sides">
-          <label>Top<input type="number" id="padTop" min="0" max="500" value="10"></label>
-          <label>Right<input type="number" id="padRight" min="0" max="500" value="10"></label>
-          <label>Bottom<input type="number" id="padBottom" min="0" max="500" value="10"></label>
-          <label>Left<input type="number" id="padLeft" min="0" max="500" value="10"></label>
+        <legend class="field-title">White space</legend>
+        <label class="check"><input type="checkbox" id="whiteSpace" checked> Add white space around the box</label>
+        <div class="white-space-options" id="whiteSpaceOptions">
+          <div class="sides">
+            <label>Top<input type="number" id="padTop" min="0" max="500" value="10"></label>
+            <label>Right<input type="number" id="padRight" min="0" max="500" value="10"></label>
+            <label>Bottom<input type="number" id="padBottom" min="0" max="500" value="10"></label>
+            <label>Left<input type="number" id="padLeft" min="0" max="500" value="10"></label>
+          </div>
+          <p class="hint">In pixels of the downloaded image. A little uneven space looks like a hand-cropped screenshot.</p>
+          <div class="inline-controls">
+            <button class="btn" id="randomize" type="button">Randomize</button>
+            <span>around</span>
+            <input type="number" id="padBase" min="0" max="500" value="10" aria-label="Average space (px)">
+            <span>px, give or take</span>
+            <input type="number" id="padVariation" min="0" max="100" value="50" aria-label="Variation (%)">
+            <span>%</span>
+          </div>
+          <label class="check"><input type="checkbox" id="autoRandomize" checked> Pick new random space for each new image</label>
         </div>
-        <div class="inline-controls">
-          <button class="btn" id="randomize" type="button">Randomize</button>
-          <span>around</span>
-          <input type="number" id="padBase" min="0" max="500" value="10" aria-label="Average space (px)">
-          <span>px, give or take</span>
-          <input type="number" id="padVariation" min="0" max="100" value="50" aria-label="Variation (%)">
-          <span>%</span>
-        </div>        <label class="check"><input type="checkbox" id="autoRandomize" checked> Randomize again for each new image</label>
       </fieldset>
 
       <div class="field">
