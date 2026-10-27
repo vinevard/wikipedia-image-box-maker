@@ -25,7 +25,7 @@ const ui = {
   site: $('site'), phoneWidth: $('phoneWidth'), textSize: $('textSize'), theme: $('theme'), direction: $('direction'),
   showIcon: $('showIcon'), scale: $('scale'), smoothing: $('smoothing'),
   randomize: $('randomize'), padBase: $('padBase'), padVariation: $('padVariation'), autoRandomize: $('autoRandomize'),
-  download: $('download'), copy: $('copy'), status: $('status'),
+  download: $('download'), copy: $('copy'), reset: $('reset'), status: $('status'),
   shot: $('shot'), page: $('page'), thumb: $('thumb'), thumbLink: $('thumbLink'), thumbCaption: $('thumbCaption'),
 };
 const PADDING_SIDES = ['top', 'right', 'bottom', 'left'];
@@ -648,6 +648,63 @@ ui.copy.addEventListener('click', async () => {
   }
 });
 
+const SETTINGS_KEY = 'wikipedia-image-box-maker-settings';
+const savedControls = [
+  ui.caption, ui.site, ui.phoneWidth, ui.width, ui.textSize, ui.theme, ui.direction, ui.showIcon,
+  ...paddingInputs, ui.padBase, ui.padVariation, ui.autoRandomize, ui.scale, ui.smoothing,
+];
+
+function saveSettings() {
+  const settings = Object.fromEntries(savedControls.map(c => [c.id, c.type === 'checkbox' ? c.checked : c.value]));
+  try {
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+  } catch {}
+}
+
+function restoreControl(control, value) {
+  if (control.type === 'checkbox') {
+    if (typeof value === 'boolean') control.checked = value;
+  } else if (typeof value === 'string' && (control.tagName !== 'SELECT' || [...control.options].some(o => o.value === value))) {
+    control.value = value;
+  }
+}
+
+function restoreSettings() {
+  let settings;
+  try {
+    settings = JSON.parse(localStorage.getItem(SETTINGS_KEY));
+  } catch {}
+  if (settings && typeof settings === 'object') {
+    for (const control of savedControls) restoreControl(control, settings[control.id]);
+  }
+  ui.widthRange.value = ui.width.value;
+}
+
+function resetSettings() {
+  for (const control of savedControls) {
+    if (control.type === 'checkbox') control.checked = control.defaultChecked;
+    else if (control.tagName === 'SELECT') control.selectedIndex = Math.max(0, [...control.options].findIndex(o => o.defaultSelected));
+    else control.value = control.defaultValue;
+  }
+  ui.widthRange.value = ui.width.value;
+  try {
+    localStorage.removeItem(SETTINGS_KEY);
+  } catch {}
+  randomizePadding();
+  scheduleThumbnails();
+}
+
+// Only user edits are saved, so tools/verify/hook.js, which sets the controls from code, leaves no settings behind
+// for the next case.
+for (const control of savedControls) {
+  control.addEventListener('input', saveSettings);
+  control.addEventListener('change', saveSettings);
+}
+ui.randomize.addEventListener('click', saveSettings);
+ui.reset.addEventListener('click', resetSettings);
+
 if (touchScreen) ui.drop.replaceChildren(bold('Tap to choose an image'));
 ui.smoothing.closest('.field').hidden = !subpixelTextSupported();
-randomizePadding();
+restoreSettings();
+if (ui.autoRandomize.checked) randomizePadding();
+else render();

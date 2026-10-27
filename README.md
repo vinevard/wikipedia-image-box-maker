@@ -30,6 +30,9 @@ this tool, with the same photo and caption.
 
 Transparent areas of an image show white, as on Wikipedia.
 
+The browser keeps the settings and the caption for your next visit. It does not keep the image. To go back to the
+default settings, click "Reset settings".
+
 ### Caption markup
 
 | Markup | Result |
