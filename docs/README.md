@@ -6,12 +6,12 @@ Make an image and a caption look like a screenshot of a Wikipedia image box.
 
 | Wikipedia | Image box maker |
 | :---: | :---: |
-| <img src="docs/compare/well-wikipedia.png" width="268" alt="Screenshot of a real Wikipedia image box"> | <img src="docs/compare/well-tool.png" width="268" alt="The same image box from this tool"> |
+| <img src="compare/well-wikipedia.png" width="268" alt="Screenshot of a real Wikipedia image box"> | <img src="compare/well-tool.png" width="268" alt="The same image box from this tool"> |
 
 The left image is a screenshot of the [Well](https://en.wikipedia.org/wiki/Well) article. The right image is from
 this tool, with the same photo and caption.
 
-<img src="docs/screenshot.png" width="720" alt="The settings and the live preview of the image box maker">
+<img src="screenshot.png" width="720" alt="The settings and the live preview of the image box maker">
 
 ## Settings
 
@@ -52,21 +52,21 @@ images.
 
 <table>
 <tr><th>Wikipedia</th><th>Image box maker</th></tr>
-<tr><td><img src="docs/compare/barn-raising-wikipedia.png" width="322" alt="Wikipedia: barn raising"></td><td><img src="docs/compare/barn-raising-tool.png" width="322" alt="Tool: barn raising"></td></tr>
+<tr><td><img src="compare/barn-raising-wikipedia.png" width="322" alt="Wikipedia: barn raising"></td><td><img src="compare/barn-raising-tool.png" width="322" alt="Tool: barn raising"></td></tr>
 <tr><td colspan="2">A 300px figure. The original is smaller than the 2x thumbnail, thus the two images use the original.</td></tr>
-<tr><td><img src="docs/compare/lighthouse-wikipedia.png" width="174" alt="Wikipedia: Point Danger lighthouse"></td><td><img src="docs/compare/lighthouse-tool.png" width="174" alt="Tool: Point Danger lighthouse"></td></tr>
+<tr><td><img src="compare/lighthouse-wikipedia.png" width="174" alt="Wikipedia: Point Danger lighthouse"></td><td><img src="compare/lighthouse-tool.png" width="174" alt="Tool: Point Danger lighthouse"></td></tr>
 <tr><td colspan="2">A tall image at 150px</td></tr>
-<tr><td><img src="docs/compare/cornell-box-wikipedia.png" width="321" alt="Wikipedia: Cornell box"></td><td><img src="docs/compare/cornell-box-tool.png" width="321" alt="Tool: Cornell box"></td></tr>
+<tr><td><img src="compare/cornell-box-wikipedia.png" width="321" alt="Wikipedia: Cornell box"></td><td><img src="compare/cornell-box-tool.png" width="321" alt="Tool: Cornell box"></td></tr>
 <tr><td colspan="2">A square image from an animated GIF. The tool uses the first frame.</td></tr>
-<tr><td><img src="docs/compare/haymakers-wikipedia.png" width="268" alt="Wikipedia: Haymakers by George Stubbs"></td><td><img src="docs/compare/haymakers-tool.png" width="268" alt="Tool: Haymakers by George Stubbs"></td></tr>
+<tr><td><img src="compare/haymakers-wikipedia.png" width="268" alt="Wikipedia: Haymakers by George Stubbs"></td><td><img src="compare/haymakers-tool.png" width="268" alt="Tool: Haymakers by George Stubbs"></td></tr>
 <tr><td colspan="2">Standard text size, and an italic link</td></tr>
-<tr><td><img src="docs/compare/carnegie-library-wikipedia.png" width="272" alt="Wikipedia: Carnegie library in Pittsburgh"></td><td><img src="docs/compare/carnegie-library-tool.png" width="272" alt="Tool: Carnegie library in Pittsburgh"></td></tr>
+<tr><td><img src="compare/carnegie-library-wikipedia.png" width="272" alt="Wikipedia: Carnegie library in Pittsburgh"></td><td><img src="compare/carnegie-library-tool.png" width="272" alt="Tool: Carnegie library in Pittsburgh"></td></tr>
 <tr><td colspan="2">Large text size, and a caption with three lines</td></tr>
-<tr><td><img src="docs/compare/rooftop-farm-wikipedia.png" width="272" alt="Wikipedia: rooftop farm, Dark theme"></td><td><img src="docs/compare/rooftop-farm-tool.png" width="272" alt="Tool: rooftop farm, Dark theme"></td></tr>
+<tr><td><img src="compare/rooftop-farm-wikipedia.png" width="272" alt="Wikipedia: rooftop farm, Dark theme"></td><td><img src="compare/rooftop-farm-tool.png" width="272" alt="Tool: rooftop farm, Dark theme"></td></tr>
 <tr><td colspan="2">Dark theme</td></tr>
-<tr><td><img src="docs/compare/allotment-wikipedia.png" width="262" alt="Wikipedia mobile site: allotment garden"></td><td><img src="docs/compare/allotment-tool.png" width="262" alt="Tool: allotment garden, mobile site"></td></tr>
+<tr><td><img src="compare/allotment-wikipedia.png" width="262" alt="Wikipedia mobile site: allotment garden"></td><td><img src="compare/allotment-tool.png" width="262" alt="Tool: allotment garden, mobile site"></td></tr>
 <tr><td colspan="2">The mobile site on a 390px phone</td></tr>
-<tr><td><img src="docs/compare/community-garden-he-wikipedia.png" width="270" alt="Hebrew Wikipedia: community garden"></td><td><img src="docs/compare/community-garden-he-tool.png" width="270" alt="Tool: community garden, right-to-left"></td></tr>
+<tr><td><img src="compare/community-garden-he-wikipedia.png" width="270" alt="Hebrew Wikipedia: community garden"></td><td><img src="compare/community-garden-he-tool.png" width="270" alt="Tool: community garden, right-to-left"></td></tr>
 <tr><td colspan="2">Right-to-left, from the Hebrew Wikipedia</td></tr>
 </table>
 
@@ -139,6 +139,6 @@ public domain or has the CC0 license. The captions are from the Wikipedia articl
 
 ## License
 
-MIT. Refer to [LICENSE](LICENSE).
+MIT. Refer to [LICENSE](../LICENSE).
 
 This project is not related to the Wikimedia Foundation. Wikipedia is a trademark of the Wikimedia Foundation.
