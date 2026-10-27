@@ -9,14 +9,14 @@
 * { box-sizing: border-box; }
 body { margin: 0; background: #fff; color: var(--text); font-family: sans-serif; }
 
-main { max-width: 1000px; margin: 0 auto; padding: 24px 24px 48px; }
+main { max-width: 1200px; margin: 0 auto; padding: 24px 24px 48px; }
 h1, h2 { font-family: var(--serif); font-weight: normal; border-bottom: 1px solid var(--border); margin: 0; }
 h1 { font-size: 1.8em; padding-bottom: 2px; }
 h2 { font-size: 1.5em; margin: 1em 0 .5em; }
 h3 { font-size: 1.2em; margin: 22px 0 8px; }
 h2 + h3 { margin-top: 0; }
 .tagline { color: var(--muted); font-size: .875em; margin: 6px 0 0; }
-.layout { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 32px; align-items: start; }
+.layout { display: grid; grid-template-columns: min(480px, 50%) minmax(0, 1fr); gap: 32px; align-items: start; }
 .settings { font-size: 14px; line-height: 1.6; }
 .settings [hidden] { display: none; }
 @media (max-width: 760px) {
