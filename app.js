@@ -22,7 +22,8 @@ for (const [direction, url] of Object.entries(ENLARGE_ICONS)) {
 const $ = id => document.getElementById(id);
 const settingsForm = $('settings');
 const ui = {
-  drop: $('drop'), file: $('file'), caption: $('caption'), width: $('width'), widthRange: $('widthRange'),
+  drop: $('drop'), file: $('file'), caption: $('caption'),
+  width: $('width'), widthRange: $('widthRange'), widthReset: $('widthReset'),
   site: $('site'), phoneWidth: $('phoneWidth'), direction: $('direction'),
   textSize: settingsForm.elements.textSize, theme: settingsForm.elements.theme,
   showIcon: $('showIcon'), scale: $('scale'), smoothing: $('smoothing'),
@@ -167,6 +168,7 @@ function render() {
   ui.shot.classList.toggle('night', ui.theme.value === 'night');
   ui.page.dir = ui.direction.value;
   renderImage(width, imageHeight(source, width));
+  ui.widthReset.disabled = width === Number(ui.width.defaultValue);
   ui.thumb.classList.toggle('no-icon', !ui.showIcon.checked);
   ui.thumbCaption.replaceChildren(parseCaption(ui.caption.value));
   ui.whiteSpaceOptions.hidden = !ui.whiteSpace.checked;
@@ -396,6 +398,12 @@ function syncWidth(e) {
 }
 ui.width.addEventListener('input', syncWidth);
 ui.widthRange.addEventListener('input', syncWidth);
+ui.widthReset.addEventListener('click', () => {
+  ui.width.value = ui.widthRange.value = ui.width.defaultValue;
+  render();
+  scheduleThumbnails();
+  saveSettings();
+});
 ui.randomize.addEventListener('click', randomizePadding);
 
 // Safari only supports canvas filters behind a flag, so the CSS filters the preview uses are applied by hand.

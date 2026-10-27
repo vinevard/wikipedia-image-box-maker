@@ -4,7 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Wikipedia Image Box Maker</title>
-<link rel="stylesheet" href="style.css">
+<!-- GitHub Pages lets browsers reuse these files for 10 minutes without checking for a new version, so a page
+     from a new deploy can get the previous app.js. Change ?v= in all three whenever any of them changes. -->
+<link rel="stylesheet" href="style.css?v=2">
 </head>
 <body>
 <main>
@@ -54,6 +56,7 @@
         <div class="row">
           <input type="range" id="widthRange" min="100" max="600" value="250">
           <input type="number" id="width" min="50" max="1200" value="250">
+          <button class="btn" id="widthReset" type="button">Reset to 250px</button>
         </div>
         <p class="hint">Wikipedia's default thumbnail is 250px. Your photo is resized and sharpened the same way Wikipedia does it.</p>
       </div>
@@ -153,7 +156,7 @@
     </section>
   </div>
 </main>
-<script src="thumbnail.js"></script>
-<script src="app.js"></script>
+<script src="thumbnail.js?v=2"></script>
+<script src="app.js?v=2"></script>
 </body>
 </html>
