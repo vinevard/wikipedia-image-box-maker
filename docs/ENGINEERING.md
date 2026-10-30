@@ -203,7 +203,7 @@ tool to the same folder.
 
 With `--check`, the script downloads the articles again and fails if a figure does not match. A figure fails if the
 box size is different, if more than 1% of the frame and caption pixels are different, or if the photo MSE is more
-than 1000. The "Wikipedia check" workflow runs this every Monday. If it fails, the image pairs are in the workflow
+than 1000. The photo of an animated image is not checked, because the capture may not show its first frame. The "Wikipedia check" workflow runs this every Monday. If it fails, the image pairs are in the workflow
 run, under "comparison".
 
 ## Run the tests

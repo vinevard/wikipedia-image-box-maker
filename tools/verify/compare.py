@@ -314,13 +314,14 @@ def summary_line(slug, result):
             f"differ noticeably ({share:.2f}%) | photo MSE {result['photo_mse']:7.1f} | thumbnail MSE {result['thumbnail_mse']}")
 
 
-def check_failure(result):
+def check_failure(case, result):
     if "size_mismatch" in result:
         return "the box size differs"
     share = 100 * result["frame_caption_noticeable"] / result["frame_caption_pixels"]
     if share > CHECK_FRAME_CAPTION_PERCENT:
         return f"{share:.2f}% of frame and caption pixels differ, more than {CHECK_FRAME_CAPTION_PERCENT}%"
-    if result["photo_mse"] > CHECK_PHOTO_MSE:
+    # An animated image keeps playing on Wikipedia, and the capture may never land on the first frame.
+    if result["photo_mse"] > CHECK_PHOTO_MSE and not case.get("animated"):
         return f"photo MSE is {result['photo_mse']}, more than {CHECK_PHOTO_MSE}"
     return None
 
@@ -339,7 +340,7 @@ def main():
         with open(report_path, "w", encoding="utf-8") as f:
             json.dump(report, f, ensure_ascii=False, indent=1)
     if "--check" in sys.argv:
-        failures = [(case["slug"], check_failure(report[case["slug"]])) for case in cases]
+        failures = [(case["slug"], check_failure(case, report[case["slug"]])) for case in cases]
         failures = [(slug, reason) for slug, reason in failures if reason]
         for slug, reason in failures:
             print(f"FAIL {slug}: {reason}")
