@@ -135,7 +135,7 @@ function thumbImage(width, height, { src, srcset }) {
 function placeholder(width, height) {
   const span = document.createElement('span');
   span.className = 'thumb-image placeholder';
-  span.textContent = 'No image yet';
+  span.textContent = touchScreen ? 'Tap to choose an image' : 'Choose an image, drop one here, or paste with Ctrl+V';
   span.style.width = width + 'px';
   span.style.height = height + 'px';
   return span;
@@ -171,7 +171,8 @@ function render() {
   ui.shot.classList.toggle('night', ui.theme.value === 'night');
   ui.page.dir = ui.direction.value;
   renderImage(width, imageHeight(source, width));
-  ui.widthReset.disabled = width === Number(ui.width.defaultValue);
+  // Hidden without display: none, so the text below does not move while the slider is dragged.
+  ui.widthReset.style.visibility = width === Number(ui.width.defaultValue) ? 'hidden' : '';
   ui.thumb.classList.toggle('no-icon', !ui.showIcon.checked);
   ui.thumbCaption.replaceChildren(parseCaption(ui.caption.value));
   ui.whiteSpaceOptions.hidden = !ui.whiteSpace.checked;
@@ -386,6 +387,7 @@ async function loadFile(file) {
 }
 
 ui.drop.addEventListener('click', () => ui.file.click());
+ui.thumbLink.addEventListener('click', () => { if (!source) ui.file.click(); });
 ui.drop.addEventListener('keydown', e => {
   if (e.key === 'Enter' || e.key === ' ') {
     e.preventDefault();
@@ -437,6 +439,8 @@ ui.widthReset.addEventListener('click', () => {
   render();
   scheduleThumbnails();
   saveSettings();
+  // The link hides itself at 250px, so focus would be lost.
+  ui.widthRange.focus();
 });
 ui.randomize.addEventListener('click', randomizePadding);
 addEventListener('resize', fitPreview);
@@ -708,11 +712,28 @@ const SAVED_SETTINGS = [
   'padTop', 'padRight', 'padBottom', 'padLeft', 'padBase', 'padVariation', 'autoRandomize', 'scale', 'smoothing',
 ];
 
+// Version 1 saved every setting, including the ones still at their defaults.
+const SETTINGS_VERSION = 2;
+
+function valueOf(control) {
+  return control.type === 'checkbox' ? control.checked : control.value;
+}
+
+function defaultOf(control) {
+  if (control.type === 'checkbox') return control.defaultChecked;
+  if (control instanceof RadioNodeList) return [...control].find(radio => radio.defaultChecked)?.value ?? '';
+  // Like form.reset(), the last option marked selected wins.
+  if (control.tagName === 'SELECT') return ([...control.options].findLast(o => o.defaultSelected) ?? control.options[0]).value;
+  return control.defaultValue;
+}
+
+// Only values that differ from the defaults are saved, so a changed default reaches users who never set it.
 function saveSettings() {
-  const settings = Object.fromEntries(SAVED_SETTINGS.map(name => {
+  const settings = { version: SETTINGS_VERSION };
+  for (const name of SAVED_SETTINGS) {
     const control = settingsForm.elements[name];
-    return [name, control.type === 'checkbox' ? control.checked : control.value];
-  }));
+    if (valueOf(control) !== defaultOf(control)) settings[name] = valueOf(control);
+  }
   try {
     localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
   } catch {}
@@ -733,16 +754,19 @@ function restoreSettings() {
     settings = JSON.parse(localStorage.getItem(SETTINGS_KEY));
   } catch {}
   if (settings && typeof settings === 'object') {
+    // Text smoothing's default changed after version 1, which saved the old default for everyone.
+    if (!settings.version) delete settings.smoothing;
     for (const name of SAVED_SETTINGS) restoreControl(settingsForm.elements[name], settings[name]);
   }
   ui.width.value = ui.widthRange.value = imageWidth();
 }
 
+// The caption is the user's content, not a setting, so it is kept.
 function resetSettings() {
+  const caption = ui.caption.value;
   settingsForm.reset();
-  try {
-    localStorage.removeItem(SETTINGS_KEY);
-  } catch {}
+  ui.caption.value = caption;
+  saveSettings();
   randomizePadding();
   scheduleThumbnails();
 }
@@ -757,8 +781,9 @@ ui.reset.addEventListener('click', resetSettings);
 if (touchScreen) ui.drop.replaceChildren(bold('Tap to choose an image'));
 // Where the browser can draw sub-pixel text, real screenshots from the same computer usually have it too.
 if (subpixelTextSupported()) ui.smoothing.querySelector('[value=subpixel]').defaultSelected = true;
-else ui.smoothing.closest('.more').hidden = true;
+else ui.smoothing.closest('.field').hidden = true;
 restoreSettings();
+ui.direction.closest('.more').open = ui.direction.value !== defaultOf(ui.direction);
 if (ui.autoRandomize.checked) randomizePadding();
 else render();
 showStatus('');

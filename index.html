@@ -6,7 +6,7 @@
 <title>Wikipedia Image Box Maker</title>
 <!-- GitHub Pages lets browsers reuse these files for 10 minutes without checking for a new version, so a page
      from a new deploy can get the previous app.js. Change ?v= in all three whenever any of them changes. -->
-<link rel="stylesheet" href="style.css?v=5">
+<link rel="stylesheet" href="style.css?v=6">
 </head>
 <body>
 <main>
@@ -56,9 +56,8 @@
         <div class="row">
           <input type="range" id="widthRange" min="50" max="600" value="250" aria-labelledby="widthLabel">
           <input type="number" id="width" min="50" max="600" value="250">
-          <button class="btn" id="widthReset" type="button">Reset to 250px</button>
         </div>
-        <p class="hint">Wikipedia's default thumbnail is 250px. Your photo is resized and sharpened the same way Wikipedia does it.</p>
+        <p class="hint">Wikipedia's default thumbnail is 250px. Your photo is resized and sharpened the same way Wikipedia does it. <button class="link-button" id="widthReset" type="button">Reset to 250px</button></p>
       </div>
 
       <fieldset class="field">
@@ -80,19 +79,7 @@
         <p class="hint">Matches the Color setting in Wikipedia's Appearance menu.</p>
       </fieldset>
 
-      <div class="field">
-        <label class="field-title" for="direction">Direction</label>
-        <select id="direction">
-          <option value="ltr" selected>Left-to-right</option>
-          <option value="rtl">Right-to-left</option>
-        </select>
-        <p class="hint">Right-to-left looks like Wikipedia in Hebrew, Arabic or Persian.</p>
-      </div>
-
-      <div class="field">
-        <label class="check"><input type="checkbox" id="showIcon" checked> Show the enlarge icon</label>
-        <p class="hint">The small two-box icon under the corner of the image. On Wikipedia it opens the full-size image.</p>
-      </div>
+      <label class="check"><input type="checkbox" id="showIcon" checked> Show the enlarge icon <span class="enlarge-sample" aria-hidden="true"></span></label>
 
       <h3>Download</h3>
       <fieldset class="field">
@@ -128,12 +115,22 @@
       </div>
 
       <details class="field more">
-        <summary>More download options</summary>
-        <label class="field-title" for="smoothing">Text smoothing</label>
-        <select id="smoothing">
-          <option value="grayscale" selected>Grayscale</option>
-          <option value="subpixel">Sub-pixel (like Windows screenshots)</option>
-        </select>
+        <summary>More options</summary>
+        <div class="field">
+          <label class="field-title" for="direction">Direction</label>
+          <select id="direction">
+            <option value="ltr" selected>Left-to-right</option>
+            <option value="rtl">Right-to-left</option>
+          </select>
+          <p class="hint">Right-to-left looks like Wikipedia in Hebrew, Arabic or Persian.</p>
+        </div>
+        <div class="field">
+          <label class="field-title" for="smoothing">Text smoothing</label>
+          <select id="smoothing">
+            <option value="grayscale" selected>Grayscale</option>
+            <option value="subpixel">Sub-pixel (like Windows screenshots)</option>
+          </select>
+        </div>
       </details>
 
       <button class="btn" id="resetSettings" type="button">Reset settings</button>
@@ -158,7 +155,7 @@
     </section>
   </div>
 </main>
-<script src="thumbnail.js?v=5"></script>
-<script src="app.js?v=5"></script>
+<script src="thumbnail.js?v=6"></script>
+<script src="app.js?v=6"></script>
 </body>
 </html>

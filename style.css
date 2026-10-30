@@ -38,12 +38,15 @@ input:focus, textarea:focus, select:focus { outline: none; border-color: var(--l
 .row { display: flex; gap: 10px; align-items: center; }
 .row input[type=range] { flex: 1; min-width: 0; accent-color: var(--link); }
 .row input[type=number] { width: 80px; }
-.row .btn { white-space: nowrap; }
 .hint { color: var(--muted); font-size: 12.5px; margin: 4px 0 0; }
 code { background: var(--bg-subtle); border: 1px solid #eaecf0; border-radius: 2px; padding: 0 3px; font-size: 12px; }
 .check { display: flex; gap: 6px; align-items: center; margin: 0 0 14px; }
 .check input { accent-color: var(--link); }
 .more summary { color: var(--link); cursor: pointer; margin-bottom: 8px; }
+.more > .field:last-child { margin-bottom: 0; }
+.link-button { font: inherit; color: var(--link); background: none; border: 0; padding: 0; cursor: pointer; }
+.link-button:hover { text-decoration: underline; }
+.enlarge-sample { display: inline-block; width: 15px; height: 11px; background-image: var(--enlarge-icon-ltr); }
 .choices { display: flex; flex-wrap: wrap; gap: 4px 20px; }
 .choices .check { margin: 0; }
 .field > .check:has(+ .hint) { margin-bottom: 0; }
@@ -181,4 +184,7 @@ fieldset .check { margin-bottom: 8px; }
 /* The mobile site's Night theme keeps the dimmed photo but gives captions its subtle grey. */
 .night .mobile .thumb-caption { color: #a2a9b1; }
 
-.placeholder { display: inline-grid; place-items: center; color: #72777d; font-size: 13px; line-height: 1.4; }
+.placeholder {
+  display: inline-grid; place-items: center; color: #72777d; font-size: 13px; line-height: 1.4;
+  text-align: center; overflow-wrap: anywhere; overflow: hidden; cursor: pointer;
+}
