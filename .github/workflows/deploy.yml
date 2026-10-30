@@ -1,8 +1,9 @@
-name: Deploy
+name: Test and deploy
 
 on:
   push:
     branches: [main]
+  pull_request:
   workflow_dispatch:
 
 permissions:
@@ -11,11 +12,22 @@ permissions:
   id-token: write
 
 concurrency:
-  group: pages
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+      - run: node --test tools/test/ui.test.mjs
+
   deploy:
+    needs: test
+    if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     environment:
       name: github-pages
@@ -27,7 +39,7 @@ jobs:
       - name: Version the file URLs
         run: |
           mkdir _site
-          cp index.html app.js style.css thumbnail.js LICENSE _site/
+          cp index.html app.js style.css thumbnail.js favicon.svg apple-touch-icon.png social.jpg LICENSE _site/
           for file in style.css thumbnail.js app.js; do
             hash=$(sha256sum "$file" | cut -c1-10)
             sed -i "s/${file//./\\.}?v=[0-9a-z]*/$file?v=$hash/" _site/index.html

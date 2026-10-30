@@ -4,29 +4,15 @@
 // optionally saves a screenshot. Waiting in real time matters: --virtual-time-budget runs ahead of Web Workers,
 // so a plain `chrome --screenshot` catches the tool before its thumbnails exist.
 import { spawn } from 'node:child_process';
-import { existsSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { findChrome } from '../chrome.mjs';
 
 const [url, ...args] = process.argv.slice(2);
 const option = (name, fallback) => (args.includes(`--${name}`) ? args[args.indexOf(`--${name}`) + 1] : fallback);
 const out = option('out');
 const timeout = Number(option('timeout', 60)) * 1000;
-
-function findChrome() {
-  const candidates = [
-    process.env.CHROME,
-    'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
-    'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe',
-    '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
-    '/usr/bin/google-chrome',
-    '/usr/bin/chromium',
-    '/usr/bin/chromium-browser',
-  ];
-  const found = candidates.find(path => path && existsSync(path));
-  if (!found) throw new Error('Chrome not found; set the CHROME environment variable to its path');
-  return found;
-}
 
 const profile = mkdtempSync(join(tmpdir(), 'capture-'));
 const port = 9500 + Math.floor(Math.random() * 400);

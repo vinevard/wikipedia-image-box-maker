@@ -122,6 +122,7 @@ the measurements and the open problems. Some examples:
 ## Changes to the box
 
 Run `python tools/verify/compare.py` before and after you change the box. Make sure that no result becomes worse.
+Run `node --test tools/test/ui.test.mjs` before you push. Refer to [ENGINEERING.md](ENGINEERING.md#run-the-tests).
 
 ## Credits
 

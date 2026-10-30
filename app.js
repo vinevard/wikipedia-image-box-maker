@@ -42,6 +42,9 @@ const SHOT_OUTLINE = 1;
 // Matches the single-column layout in style.css.
 const narrowScreen = matchMedia('(max-width: 760px)');
 const FILE_NAME_SLUG_LENGTH = 60;
+// Sub-pixel text has fringes of 150 levels or more; grey text, 2 at most.
+const SUBPIXEL_FRINGE = 24;
+const SUBPIXEL_FRINGE_PIXELS = 10;
 const CAPTION_MARKUP = /\[\[([^\]|]+)(?:\|([^\]]*))?\]\]|'''(.+?)'''|''(.+?)''/g;
 
 let source = null;
@@ -698,15 +701,26 @@ function drawExport(scale, zoom, shot) {
   return canvas;
 }
 
+// Draws a caption the way the export does: same font, size and colours, on an opaque canvas. Some fonts and sizes
+// never get sub-pixel text, and grey text such as #202122 differs by a level or two between channels anyway, so
+// only clear colour fringes count.
 function subpixelTextSupported() {
   const ctx = document.createElement('canvas').getContext('2d', { alpha: false });
-  ctx.fillStyle = '#fff';
-  ctx.fillRect(0, 0, 40, 30);
-  ctx.fillStyle = '#000';
-  ctx.font = '20px sans-serif';
-  ctx.fillText('x', 5, 20);
-  const { data } = ctx.getImageData(0, 0, 40, 30);
-  return data.some((value, i) => i % 4 === 0 && (value !== data[i + 1] || value !== data[i + 2]));
+  ctx.canvas.width = 200;
+  ctx.canvas.height = 30;
+  const caption = getComputedStyle(ui.thumbCaption);
+  ctx.fillStyle = getComputedStyle(ui.thumb).backgroundColor;
+  ctx.fillRect(0, 0, 200, 30);
+  ctx.fillStyle = caption.color;
+  ctx.font = `${caption.fontSize} ${caption.fontFamily}`;
+  ctx.fillText('An example caption with a link', 4, 20);
+  const { data } = ctx.getImageData(0, 0, 200, 30);
+  let fringes = 0;
+  for (let i = 0; i < data.length; i += 4) {
+    const [r, g, b] = data.subarray(i, i + 3);
+    if (Math.max(r, g, b) - Math.min(r, g, b) > SUBPIXEL_FRINGE) fringes++;
+  }
+  return fringes >= SUBPIXEL_FRINGE_PIXELS;
 }
 
 // Keeps letters of any script and cuts at a word boundary. Lengths count code points, so a cut can't split one.

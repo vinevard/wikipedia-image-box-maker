@@ -127,7 +127,17 @@ removed. Thus the export uses a new `<img>`.
 ### Sub-pixel text
 
 Canvas text gets coloured sub-pixel anti-aliasing only on an opaque canvas. The "Sub-pixel" setting selects this
-mode. The tool hides the setting in browsers that do not make sub-pixel text.
+mode.
+
+At startup, the tool draws a caption on an opaque canvas with the font, size and colours of the box. If the text has
+colour fringes, the default is sub-pixel. If not, the tool hides the setting, because the export cannot make
+sub-pixel text. The test counts only pixels where the colour channels differ by more than 24 levels. Sub-pixel text
+gives differences of 150 levels or more. Grey text such as `#202122` gives differences of 1 or 2 levels, which an
+earlier version of the test counted as sub-pixel text.
+
+A page cannot read the pixels of its own text, so the test uses the canvas as a substitute for the page. In Chrome on
+Windows with ClearType, the canvas and the page agree at 1x, 1.5x and 2x. In headless Firefox, the canvas has sub-pixel
+text but the page does not. A normal Firefox window, and a computer with ClearType off, were not tested.
 
 ### Dark theme
 
@@ -190,3 +200,19 @@ python tools/verify/compare.py --docs          all figures, and copy the image p
 The script keeps its downloads in `tools/verify/out/cache/`. It waits 4 seconds between requests to Wikipedia. It
 writes the results to `tools/verify/out/report.json`, and writes each pair of images and the thumbnail files of the
 tool to the same folder.
+
+With `--check`, the script downloads the articles again and fails if a figure does not match. A figure fails if the
+box size is different, if more than 1% of the frame and caption pixels are different, or if the photo MSE is more
+than 1000. The "Wikipedia check" workflow runs this every Monday. If it fails, the image pairs are in the workflow
+run, under "comparison".
+
+## Run the tests
+
+You need Node 22 or later and Chrome.
+
+```
+node --test tools/test/ui.test.mjs
+```
+
+The tests open the tool in headless Chrome and use real clicks, taps, typing and drops. They do not need a network
+connection. The "Test and deploy" workflow runs them on each push. If a test fails, the site is not deployed.

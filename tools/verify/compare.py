@@ -6,6 +6,7 @@ headless Chrome, makes the same figure with the tool (a 2x download from a 1x pa
     python tools/verify/compare.py               all cases
     python tools/verify/compare.py well haymakers some of them
     python tools/verify/compare.py --docs        also copy the pairs into docs/compare/
+    python tools/verify/compare.py --check       fetch the articles again, and fail if a figure no longer matches
 
 Needs Python 3.9+ with Pillow, Node 22+ and Chrome. Downloads are cached in tools/verify/out/cache/.
 """
@@ -40,6 +41,10 @@ PHONE_WIDTH = 390
 BACKGROUND = {"day": (255, 255, 255), "night": (16, 20, 24)}
 FONT_SIZE_CLASS = {14: 0, 16: 1, 20: 2}
 NOTICEABLE = 40
+# --check fails above these. The worst figures are at 0.21% and 480, so a change in how Wikipedia draws the box
+# shows up here, and the normal differences in anti-aliasing and sharpening do not.
+CHECK_FRAME_CAPTION_PERCENT = 1.0
+CHECK_PHOTO_MSE = 1000
 
 last_request = 0.0
 
@@ -245,6 +250,8 @@ def compare_thumbnails(case, details):
 def run_case(case):
     slug = case["slug"]
     theme = case.get("theme", "day")
+    if "--check" in sys.argv and os.path.exists(os.path.join(CACHE, f"{slug}.html")):
+        os.remove(os.path.join(CACHE, f"{slug}.html"))
     page = open(cached(f"{slug}.html", article_url(case), case.get("site") == "mobile"), encoding="utf-8").read()
     details = figure_details(find_figure(page, case["file"]))
     info = commons_info(case["file"])
@@ -293,6 +300,17 @@ def summary_line(slug, result):
             f"differ noticeably ({share:.2f}%) | photo MSE {result['photo_mse']:7.1f} | thumbnail MSE {result['thumbnail_mse']}")
 
 
+def check_failure(result):
+    if "size_mismatch" in result:
+        return "the box size differs"
+    share = 100 * result["frame_caption_noticeable"] / result["frame_caption_pixels"]
+    if share > CHECK_FRAME_CAPTION_PERCENT:
+        return f"{share:.2f}% of frame and caption pixels differ, more than {CHECK_FRAME_CAPTION_PERCENT}%"
+    if result["photo_mse"] > CHECK_PHOTO_MSE:
+        return f"photo MSE is {result['photo_mse']}, more than {CHECK_PHOTO_MSE}"
+    return None
+
+
 def main():
     args = [a for a in sys.argv[1:] if not a.startswith("--")]
     os.makedirs(CACHE, exist_ok=True)
@@ -306,6 +324,13 @@ def main():
         print(summary_line(case["slug"], report[case["slug"]]), flush=True)
         with open(report_path, "w", encoding="utf-8") as f:
             json.dump(report, f, ensure_ascii=False, indent=1)
+    if "--check" in sys.argv:
+        failures = [(case["slug"], check_failure(report[case["slug"]])) for case in cases]
+        failures = [(slug, reason) for slug, reason in failures if reason]
+        for slug, reason in failures:
+            print(f"FAIL {slug}: {reason}")
+        if failures:
+            sys.exit(1)
     if "--docs" in sys.argv:
         docs = os.path.join(ROOT, "docs", "compare")
         os.makedirs(docs, exist_ok=True)
