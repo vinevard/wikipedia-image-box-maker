@@ -302,17 +302,33 @@ test('on a phone, a wide box fits the screen and a tap shows it at full size', a
   assert.ok(await zoom() < 1);
 });
 
+// Linux places text on the screen's pixel grid, so captions can differ by a few anti-aliased pixels between pixel
+// ratios. The frame, photo and icon must not differ at all, and the size must not change.
 test('a download is the same from screens of any pixel ratio', async () => {
+  const pngSize = dataUrl => {
+    const png = Buffer.from(dataUrl.split(',')[1], 'base64');
+    return `${png.readUInt32BE(16)}x${png.readUInt32BE(20)}`;
+  };
   const downloads = async pixelRatio => {
     await open(PHONE, { pixelRatio });
     await loadImage(1600, 1200);
     await evaluate(`paddingInputs.forEach(input => { input.value = '10'; }); ui.smoothing.value = 'grayscale'`);
     await setWidth(300);
-    return [await exportImage(1), await exportImage(2), await exportImage(3)];
+    const result = { withoutCaption: [], sizesWithCaption: [] };
+    for (const scale of [1, 2, 3]) {
+      await evaluate(`ui.caption.value = ''; render()`);
+      result.withoutCaption.push(await exportImage(scale));
+      await evaluate(`ui.caption.value = 'An old-fashioned water well in the countryside of [[Utajärvi]]'; render()`);
+      result.sizesWithCaption.push(pngSize(await exportImage(scale)));
+    }
+    return result;
   };
   const reference = await downloads(1);
   for (const pixelRatio of [1.5, 2.625, 3]) {
-    assert.deepEqual(await downloads(pixelRatio), reference, `pixel ratio ${pixelRatio}`);
+    const result = await downloads(pixelRatio);
+    assert.deepEqual(result.sizesWithCaption, reference.sizesWithCaption, `sizes at pixel ratio ${pixelRatio}`);
+    assert.ok(result.withoutCaption.every((image, i) => image === reference.withoutCaption[i]),
+      `pixels without a caption at pixel ratio ${pixelRatio}`);
   }
 });
 
