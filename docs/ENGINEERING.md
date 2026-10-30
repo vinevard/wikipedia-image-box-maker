@@ -50,14 +50,15 @@ The export makes a hidden copy of the preview with CSS `zoom` equal to the scale
 On a 1x screen, a zoom of 2 gives the same layout and pixel alignment as a 2x screen. The comparisons with real
 Wikipedia figures use this case.
 
-An earlier version used `zoom = scale / devicePixelRatio`, so that the zoom and the pixel ratio together gave the
-scale. This failed on every screen that is not 1x. With a zoom below 1, or between whole numbers, browsers round
-border widths to a different number of pixels. A 2x download from a 3x phone was 4px wider and taller than from a 1x
-screen, and a 1x download from a 2x screen was 4px wider. A zoom that is a whole number gives the same layout at all
-pixel ratios. With `zoom = scale`, the downloads in Chrome and Firefox are identical at pixel ratios of 1, 1.25, 1.5,
-1.6, 2, 2.625 and 3. In WebKit, they are identical at 1 and 2, and the 2x download is identical at 3. In the other
-WebKit cases, a download can be 1 to 4px smaller than from a 1x screen. Fractional ratios occur with operating system
-scaling and browser zoom.
+The zoom must be a whole number. A zoom of `scale / devicePixelRatio` also gives the scale together with the pixel
+ratio, but on most screens it is below 1 or between two whole numbers. With such a zoom, browsers round border
+widths to a different number of pixels, and Chrome gives a 1px border a width of 1.5px. A 2x download from a 3x
+phone is then 4px wider and taller than a 2x download from a 1x screen.
+
+With `zoom = scale`, the downloads in Chrome and Firefox are identical at pixel ratios of 1, 1.25, 1.5, 1.6, 2, 2.625
+and 3. In WebKit, the downloads are identical at pixel ratios of 1 and 2, and the 2x download is also identical at 3.
+In the other WebKit cases, a download can be 1 to 4px smaller than from a 1x screen. Fractional pixel ratios occur
+with operating system scaling and with browser zoom.
 
 Firefox rounds the `88.4%` font size of the caption after it applies the zoom. A screen with a higher pixel density
 rounds the font size before. Thus the copy uses the rounded font size of the preview.
@@ -140,13 +141,12 @@ mode.
 
 At startup, the tool draws a caption on an opaque canvas with the font, size and colours of the box. If the text has
 colour fringes, the default is sub-pixel. If not, the tool hides the setting, because the export cannot make
-sub-pixel text. The test counts only pixels where the colour channels differ by more than 24 levels. Sub-pixel text
-gives differences of 150 levels or more. Grey text such as `#202122` gives differences of 1 or 2 levels, which an
-earlier version of the test counted as sub-pixel text.
+sub-pixel text. The test counts only pixels where the colour channels differ by more than 24 levels. Sub-pixel text gives
+differences of 150 levels or more, but grey text such as `#202122` also gives differences of 1 or 2 levels.
 
-A page cannot read the pixels of its own text, so the test uses the canvas as a substitute for the page. In Chrome on
-Windows with ClearType, the canvas and the page agree at 1x, 1.5x and 2x. In headless Firefox, the canvas has sub-pixel
-text but the page does not. A normal Firefox window, and a computer with ClearType off, were not tested.
+A page cannot read the pixels of its own text, so the test uses the canvas as a substitute for the page. In Chrome
+on Windows with ClearType, the canvas and the page agree at 1x, 1.5x and 2x. In headless Firefox, the canvas has
+sub-pixel text but the page does not. A normal Firefox window, and a computer with ClearType off, were not tested.
 
 ### Dark theme
 
