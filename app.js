@@ -223,7 +223,8 @@ function randomizePadding() {
 function showStatus(message) {
   const status = { message };
   currentStatus = status;
-  ui.status.textContent = message;
+  // Disabled buttons get no clicks, so the reason they are disabled stays in view instead.
+  ui.status.textContent = message || (source ? '' : 'Choose an image first.');
   return status;
 }
 
@@ -414,6 +415,8 @@ document.addEventListener('paste', e => {
 });
 
 for (const input of [ui.caption, ...paddingInputs]) input.addEventListener('input', render);
+// A typed side value would be replaced by the next image.
+for (const input of paddingInputs) input.addEventListener('input', () => { ui.autoRandomize.checked = false; });
 for (const input of [ui.site, ui.phoneWidth, ui.showIcon, ui.whiteSpace, ...ui.textSize, ...ui.theme, ui.direction, ui.scale]) {
   input.addEventListener('change', render);
 }
@@ -650,9 +653,14 @@ function subpixelTextSupported() {
   return data.some((value, i) => i % 4 === 0 && (value !== data[i + 1] || value !== data[i + 2]));
 }
 
+// Keeps letters of any script and cuts at a word boundary. Lengths count code points, so a cut can't split one.
 function fileName() {
-  const slug = ui.thumbCaption.textContent.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
-    .slice(0, FILE_NAME_SLUG_LENGTH);
+  const words = ui.thumbCaption.textContent.normalize('NFC').toLowerCase().match(/[\p{L}\p{M}\p{N}]+/gu) || [];
+  let slug = [...words[0] || ''].slice(0, FILE_NAME_SLUG_LENGTH).join('');
+  for (const word of words.slice(1)) {
+    if ([...slug].length + 1 + [...word].length > FILE_NAME_SLUG_LENGTH) break;
+    slug += '-' + word;
+  }
   return (slug || 'wikipedia-image') + '.png';
 }
 
@@ -753,3 +761,4 @@ else ui.smoothing.closest('.more').hidden = true;
 restoreSettings();
 if (ui.autoRandomize.checked) randomizePadding();
 else render();
+showStatus('');
