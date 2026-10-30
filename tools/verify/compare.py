@@ -139,6 +139,12 @@ def isolated_page(case, page):
     background = "#%02x%02x%02x" % BACKGROUND[theme]
     script = f"""<script>
 addEventListener('load', () => {{
+  // Wikipedia can refuse the stylesheet, for example to a busy shared server. The unstyled figure must not count as
+  // a change to Wikipedia.
+  if (!getComputedStyle(document.body).fontFamily.includes('sans-serif')) {{
+    document.title = 'error: the Wikipedia stylesheet did not load';
+    return;
+  }}
   const figure = [...document.querySelectorAll('figure')].find(f => decodeURIComponent(f.innerHTML).includes({json.dumps(':' + case['file'])}));
   {pin}
   figure.classList.add('verify-keep');
@@ -156,7 +162,8 @@ addEventListener('load', () => {{
 def phone_frame(src):
     return ("<!doctype html><html><head><meta charset='utf-8'><style>html, body { margin: 0; background: #fff; } "
             f"iframe {{ border: 0; display: block; width: {PHONE_WIDTH}px; height: 844px; }}</style></head><body>"
-            f"<iframe src='{src}' onload=\"setTimeout(() => document.title = 'ready', 2500)\"></iframe></body></html>")
+            f"<iframe src='{src}' onload=\"setTimeout(() => {{ const title = frames[0].document.title; "
+            "document.title = title.startsWith('error') ? title : 'ready'; }, 2500)\"></iframe></body></html>")
 
 
 def capture(url, out=None, dpr=2, width=800, height=900):
@@ -188,7 +195,14 @@ def capture_real(case, page_name, theme):
             f.write(phone_frame(url))
         url = f"{BASE}/tools/verify/out/{frame}"
     shot = os.path.join(OUT, f"shot-{case['slug']}.png")
-    capture(url, shot, width=600 if mobile else 800)
+    for attempt in range(3):
+        try:
+            capture(url, shot, width=600 if mobile else 800)
+            break
+        except subprocess.CalledProcessError:
+            if attempt == 2:
+                raise
+            time.sleep(30)
     image = Image.open(shot).convert("RGB")
     return image, content_box(image, BACKGROUND[theme])
 

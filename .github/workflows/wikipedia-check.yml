@@ -12,7 +12,8 @@ permissions:
 
 jobs:
   compare:
-    runs-on: ubuntu-latest
+    # The limits in compare.py were measured on Windows. Linux draws text differently enough to fail them.
+    runs-on: windows-latest
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v7
