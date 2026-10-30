@@ -129,7 +129,7 @@ tables of the Wikipedia thumbnails agree with JPEG quality 87 and 4:2:0 chroma s
 real thumbnails selected a Lanczos3 resize in sRGB, with an unsharp mask of sigma 1.0 and amount 0.7.
 
 The thumbnail server rounds a height of x.5 down, but the `height` attribute in the page rounds it up, so with
-`height: auto` this half pixel sets the height of the box. Refer to [Thumbnails](ENGINEERING.md#thumbnails).
+`height: auto` this half pixel sets the height of the box. Refer to [Thumbnail pipeline](ENGINEERING.md#thumbnail-pipeline).
 
 ### Text
 
@@ -137,7 +137,7 @@ The box uses the system `sans-serif` font, as the Vector 2022 skin does, and can
 anti-aliasing only on an opaque canvas. A page cannot read the pixels of its own text, so at startup the tool draws a
 caption on an opaque canvas with the font, size and colours of the box. If 10 or more pixels have colour channels
 that differ by more than 24 levels, the default is sub-pixel text. Refer to
-[Sub-pixel text](ENGINEERING.md#sub-pixel-text).
+[Text smoothing](ENGINEERING.md#text-smoothing).
 
 ### Pixel density
 
@@ -146,7 +146,7 @@ zoom gives the same layout at all pixel ratios. With a fractional zoom such as `
 round border widths differently, and Chrome gives a 1px border a width of 1.5px at a zoom of 0.667.
 
 Firefox rounds the `88.4%` font size of the caption after the zoom, so the copy uses the font size of the preview.
-Refer to [A 2x download from a 1x screen](ENGINEERING.md#a-2x-download-from-a-1x-screen).
+Refer to [Pixel density](ENGINEERING.md#pixel-density).
 
 ### Browser details
 
@@ -159,7 +159,7 @@ same. Thus the export reads the position of each word from the browser and draws
 - Firefox rejects `img.decode()` for an image that had a `srcset` attribute before, so the export uses a new `<img>`.
 
 Refer to [Export](ENGINEERING.md#export) and
-[Details that each changed a pixel](ENGINEERING.md#details-that-each-changed-a-pixel).
+[Browser workarounds](ENGINEERING.md#browser-workarounds).
 
 ### Checks
 
@@ -177,12 +177,12 @@ same photos.
 The browser tests in `tools/test/` run before each deploy, and a failed test stops the deploy. One test makes
 downloads at different pixel ratios. It compares the pixels of downloads without a caption, but only the size of
 downloads with a caption, because Linux puts text on the pixel grid of the screen. Refer to
-[Run the comparisons](ENGINEERING.md#run-the-comparisons) and [Run the tests](ENGINEERING.md#run-the-tests).
+[Comparison with Wikipedia](ENGINEERING.md#comparison-with-wikipedia) and [Browser tests](ENGINEERING.md#browser-tests).
 
 ## Limitations
 
 - The photo is not bit-identical to the Wikipedia thumbnail, and the difference is largest in the 1x files of
-  large photos. Refer to [Open problems](ENGINEERING.md#open-problems).
+  large photos. Refer to [Known issues](ENGINEERING.md#known-issues).
 - The box uses the sans-serif font of your system, as Wikipedia does, so a download from Windows looks like a Windows
   screenshot.
 - A photo of 12 megapixels or more takes approximately one second to process.
@@ -190,7 +190,7 @@ downloads with a caption, because Linux puts text on the pixel grid of the scree
 ## Changes to the box
 
 Run `python tools/verify/compare.py` before and after you change the box, and make sure that no result becomes worse.
-Run `node --test tools/test/ui.test.mjs` before you push. Refer to [ENGINEERING.md](ENGINEERING.md#run-the-tests).
+Run `node --test tools/test/ui.test.mjs` before you push. Refer to [Development](ENGINEERING.md#development).
 
 ## Credits
 
