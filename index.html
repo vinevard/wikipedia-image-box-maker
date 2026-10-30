@@ -4,9 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Wikipedia Image Box Maker</title>
-<!-- GitHub Pages lets browsers reuse these files for 10 minutes without checking for a new version, so a page
-     from a new deploy can get the previous app.js. Change ?v= in all three whenever any of them changes. -->
-<link rel="stylesheet" href="style.css?v=6">
+<!-- The deploy workflow replaces each ?v= with a hash of that file, so a new page never runs a cached old script. -->
+<link rel="stylesheet" href="style.css?v=dev">
 </head>
 <body>
 <main>
@@ -138,12 +137,14 @@
 
     <section class="preview">
       <h2>Preview</h2>
-      <div class="shot" id="shot">
-        <div class="page" id="page">
-          <figure class="thumb" id="thumb">
-            <a class="thumb-link" id="thumbLink"></a>
-            <figcaption class="thumb-caption" id="thumbCaption"></figcaption>
-          </figure>
+      <div class="shot-frame">
+        <div class="shot" id="shot">
+          <div class="page" id="page">
+            <figure class="thumb" id="thumb">
+              <a class="thumb-link" id="thumbLink"></a>
+              <figcaption class="thumb-caption" id="thumbCaption"></figcaption>
+            </figure>
+          </div>
         </div>
       </div>
       <p class="hint" id="previewScale" hidden></p>
@@ -155,7 +156,7 @@
     </section>
   </div>
 </main>
-<script src="thumbnail.js?v=6"></script>
-<script src="app.js?v=6"></script>
+<script src="thumbnail.js?v=dev"></script>
+<script src="app.js?v=dev"></script>
 </body>
 </html>

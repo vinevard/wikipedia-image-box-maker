@@ -77,7 +77,13 @@ fieldset .check { margin-bottom: 8px; }
 .drop.over { border-color: var(--link); color: var(--link); background: #eaf3ff; }
 .drop.loaded { border-style: solid; color: var(--text); overflow-wrap: anywhere; }
 
-.preview { overflow-x: auto; padding: 4px 2px 2px; }
+.preview { padding: 3px 1px 1px; }
+/* Only the box scrolls sideways, so the buttons below it stay in view. */
+.shot-frame { overflow-x: auto; padding: 1px; }
+@media (min-width: 761px) {
+  .preview.sticky { position: sticky; top: 0; }
+}
+.shot.zoomable { cursor: pointer; }
 .shot { width: max-content; background: #fff; outline: 1px dashed var(--border); }
 .export-layout { position: fixed; left: 0; top: 0; visibility: hidden; }
 

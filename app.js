@@ -54,6 +54,8 @@ let thumbnailTimer = 0;
 let renderedImageKey = '';
 let runningExports = 0;
 let currentStatus = null;
+// Set by a tap on a preview that was shrunk to fit.
+let previewFullSize = false;
 
 function parseCaption(text) {
   const fragment = document.createDocumentFragment();
@@ -185,13 +187,20 @@ function render() {
 // download. Only the caption's font size is read from the preview, by unzoomedCaptionFontSize.
 function fitPreview() {
   ui.shot.style.zoom = '';
-  const preview = ui.shot.parentElement;
-  const style = getComputedStyle(preview);
-  const room = preview.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight) - 2 * SHOT_OUTLINE;
+  const frame = ui.shot.parentElement;
+  const style = getComputedStyle(frame);
+  const room = frame.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight) - 2 * SHOT_OUTLINE;
   const fit = narrowScreen.matches ? Math.min(1, room / ui.shot.getBoundingClientRect().width) : 1;
-  if (fit < 1) ui.shot.style.zoom = fit;
+  if (fit < 1 && !previewFullSize) ui.shot.style.zoom = fit;
+  ui.shot.classList.toggle('zoomable', fit < 1 && !!source);
   ui.previewScale.hidden = fit === 1;
-  ui.previewScale.textContent = `Shown at ${Math.floor(fit * 100)}% to fit your screen. The download keeps its full size.`;
+  let note = `Shown at ${Math.floor(fit * 100)}% to fit your screen.`;
+  if (previewFullSize) note = 'Shown at full size. Scroll sideways to see all of it, or tap the preview to fit it to your screen.';
+  else if (source) note += ' Tap the preview to see it at full size. The download keeps its full size.';
+  ui.previewScale.textContent = note;
+  // A preview taller than the window would hide its own bottom and buttons if it stayed in place.
+  const preview = frame.parentElement;
+  preview.classList.toggle('sticky', preview.offsetHeight <= innerHeight);
 }
 
 // Firefox rounds a zoomed font size differently, so the fit-to-screen zoom is taken off while reading it.
@@ -343,6 +352,7 @@ function revokeRetiredSourceUrls() {
 function useSource(newSource) {
   const previousUrl = source?.image.src;
   source = newSource;
+  previewFullSize = false;
   setShownThumbnails(null);
   clearThumbnailCache();
   setStatus('');
@@ -386,8 +396,49 @@ async function loadFile(file) {
   URL.revokeObjectURL(url);
 }
 
+// An image dragged from another page arrives as its URL. Wikimedia lets other sites read its images; most sites
+// do not, and the error tells the user to save the image first.
+function draggedImageUrl(dataTransfer) {
+  const html = dataTransfer.getData('text/html');
+  // Wikipedia wraps images in a link to the file page, so the image's own address is only in the HTML.
+  const src = html && new DOMParser().parseFromString(html, 'text/html').querySelector('img')?.getAttribute('src');
+  const url = src || dataTransfer.getData('text/uri-list').split(/\r?\n/).find(line => line && !line.startsWith('#'));
+  return url?.startsWith('//') ? 'https:' + url : url;
+}
+
+// Wikipedia shows a resized copy. The tool resizes from the original, which is on upload.wikimedia.org at the
+// same path without /thumb/ and the size prefix. Formats that browsers cannot show, such as SVG and TIFF, keep
+// the copy.
+function originalImageUrl(url) {
+  const { hostname, pathname } = new URL(url);
+  const match = pathname.match(/^(\/.+?)\/thumb(\/.+\.(?:jpe?g|png|gif|webp))\/[^/]+$/i);
+  if (!match || !/^(upload|thumb)\.wikimedia\.org$/.test(hostname)) return url;
+  return 'https://upload.wikimedia.org' + match[1] + match[2];
+}
+
+async function loadUrl(url) {
+  if (!/^https?:/.test(url ?? '')) return;
+  const id = ++loadId;
+  showStatus('Loading the image…');
+  try {
+    const response = await fetch(originalImageUrl(url));
+    const blob = await response.blob();
+    if (!response.ok || !blob.type.startsWith('image/')) throw new Error();
+    if (id !== loadId) return;
+    const name = decodeURIComponent(new URL(response.url).pathname.split('/').pop());
+    await loadFile(new File([blob], name, { type: blob.type }));
+  } catch {
+    if (id === loadId) setStatus('Could not load that image. Save it, then choose or drop the file.');
+  }
+}
+
 ui.drop.addEventListener('click', () => ui.file.click());
 ui.thumbLink.addEventListener('click', () => { if (!source) ui.file.click(); });
+ui.shot.addEventListener('click', () => {
+  if (!ui.shot.classList.contains('zoomable')) return;
+  previewFullSize = !previewFullSize;
+  fitPreview();
+});
 ui.drop.addEventListener('keydown', e => {
   if (e.key === 'Enter' || e.key === ' ') {
     e.preventDefault();
@@ -401,12 +452,13 @@ const fileDragHandlers = {
   dragleave: e => { if (!e.relatedTarget) ui.drop.classList.remove('over'); },
   drop: e => {
     ui.drop.classList.remove('over');
-    loadFile(e.dataTransfer.files[0]);
+    if (e.dataTransfer.files.length) loadFile(e.dataTransfer.files[0]);
+    else loadUrl(draggedImageUrl(e.dataTransfer));
   },
 };
 for (const [type, handle] of Object.entries(fileDragHandlers)) {
   document.addEventListener(type, e => {
-    if (!e.dataTransfer.types.includes('Files')) return;
+    if (!e.dataTransfer.types.includes('Files') && !e.dataTransfer.types.includes('text/uri-list')) return;
     e.preventDefault();
     handle(e);
   });

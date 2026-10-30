@@ -28,6 +28,10 @@ this tool, with the same photo and caption.
 | Download size | 1x, 2x or 3x. The result does not change with the pixel density of your screen. |
 | Text smoothing | Grayscale, or sub-pixel as in Windows screenshots. The default is sub-pixel if your browser can make sub-pixel text. |
 
+To load an image, choose a file, drop a file, or paste an image. You can also drag an image from a Wikipedia page.
+Then the tool uses the original file from Wikimedia, not the smaller copy on the page. Most other sites do not let the
+tool read their images. For these images, save the image first.
+
 Transparent areas of an image show white, as on Wikipedia.
 
 The browser keeps the settings and the caption for your next visit. It does not keep the image. To go back to the
