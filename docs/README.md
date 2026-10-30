@@ -104,8 +104,9 @@ the measurements and the open problems. Some examples:
 
 - The MediaWiki enlarge icon has an 11×15 drawing area, but Wikipedia shows it at 15×11. This distortion gives the
   icon its shape.
-- CSS `zoom` multiplies with `devicePixelRatio`. A hidden copy with `zoom: 2 / devicePixelRatio` has the same layout
-  as on a 2x screen. Thus a 1x screen can make an exact 2x download.
+- A hidden copy with CSS `zoom: 2` has the same layout as on a 2x screen. Thus a 1x screen can make an exact 2x
+  download. The zoom must be a whole number. With a zoom such as `2 / devicePixelRatio`, browsers round border widths
+  differently, and a download from a phone was 4px too large.
 - The Wikipedia thumbnail server rounds a height of x.5 down. The `height` attribute in the page rounds it up. With
   `height: auto`, this half pixel sets the height of the box.
 - Chrome can show a cached 2x `srcset` file on a 1x screen. This occurs when the page loaded the same URL before.

@@ -211,7 +211,8 @@ def make_with_tool(case, details, original, margins):
     params = {
         "file": f"tools/verify/out/cache/{os.path.basename(original)}", "width": details["width"], "caption": details["caption"],
         "site": case.get("site", "desktop"), "theme": case.get("theme", "day"), "direction": case.get("direction", "ltr"),
-        "textSize": case.get("textSize", 14), "phoneWidth": PHONE_WIDTH, "smoothing": "subpixel",
+        # Text smoothing stays at the tool's default, which follows what this computer can draw.
+        "textSize": case.get("textSize", 14), "phoneWidth": PHONE_WIDTH,
         "pads": ",".join(map(str, margins)), "scale": 2, "out": f"{case['slug']}-tool.png",
     }
     capture(f"{BASE}/verify.html?{urllib.parse.urlencode(params)}", dpr=1, width=1100, height=1000)

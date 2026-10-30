@@ -140,7 +140,7 @@ function thumbImage(width, height, { src, srcset }) {
 function placeholder(width, height) {
   const span = document.createElement('span');
   span.className = 'thumb-image placeholder';
-  span.textContent = touchScreen ? 'Tap to choose an image' : 'Choose an image, drop one here, or paste with Ctrl+V';
+  span.textContent = touchScreen ? 'Tap to choose an image' : `Choose an image, drop one here, or paste with ${PASTE_KEY}`;
   span.style.width = width + 'px';
   span.style.height = height + 'px';
   return span;
@@ -370,6 +370,7 @@ function useSource(newSource) {
 
 // Phones and tablets can't drop files or press Ctrl+V, so they get shorter instructions.
 const touchScreen = matchMedia('(hover: none) and (pointer: coarse)').matches;
+const PASTE_KEY = /mac/i.test(navigator.userAgentData?.platform ?? navigator.platform) ? '⌘V' : 'Ctrl+V';
 
 function bold(text) {
   const element = document.createElement('strong');
@@ -378,13 +379,14 @@ function bold(text) {
 }
 
 function showLoadedFile(name) {
-  const instructions = touchScreen ? 'Tap to choose another.' : 'Choose another, drop one here, or paste with Ctrl+V';
+  const instructions = touchScreen ? 'Tap to choose another.' : `Choose another, drop one here, or paste with ${PASTE_KEY}`;
   ui.drop.replaceChildren(bold(name), ' is loaded. ' + instructions);
   ui.drop.classList.add('loaded');
 }
 
 async function loadFile(file) {
-  if (!file || !file.type.startsWith('image/')) return;
+  if (!file) return;
+  if (!file.type.startsWith('image/')) return setStatus('That file is not an image. Choose a JPEG, PNG, GIF or WebP file.');
   const id = ++loadId;
   const url = URL.createObjectURL(file);
   try {
@@ -394,7 +396,7 @@ async function loadFile(file) {
       return useSource({ image, pixels: readPixels(image), type: file.type });
     }
   } catch {
-    if (id === loadId) setStatus('Could not read that image.');
+    if (id === loadId) setStatus('Could not read that image. Try a JPEG or PNG file.');
   }
   URL.revokeObjectURL(url);
 }
@@ -565,8 +567,9 @@ function exportImage(img, url) {
   return copy;
 }
 
-// A hidden copy of the preview. zoom multiplies with devicePixelRatio, so with zoom = scale / devicePixelRatio
-// the browser lays it out, fonts and pixel snapping included, as it would on a screen whose ratio is the scale.
+// A hidden copy of the preview, laid out with zoom = scale. A whole-number zoom gives the same layout on every
+// screen. A zoom of scale / devicePixelRatio does not: below 1 or between whole numbers, browsers round border
+// widths to a different number of pixels, and a 2x download from a 3x phone came out 4px too large.
 function exportLayout(zoom, imageUrl) {
   const shot = ui.shot.cloneNode(true);
   for (const element of [shot, ...shot.querySelectorAll('[id]')]) element.removeAttribute('id');
@@ -605,7 +608,7 @@ async function paintExport(scale) {
   // A private URL for the same file keeps it out of the cache entry for its srcset URL. Chrome would otherwise
   // show a cached 2x file even on a 1x screen, which a Wikipedia visitor's browser wouldn't.
   const imageUrl = file.owned ? URL.createObjectURL(file.blob) : file.url;
-  const zoom = scale / devicePixelRatio;
+  const zoom = scale;
   const shot = exportLayout(zoom, imageUrl);
   try {
     await shot.querySelector('img').decode();
@@ -845,10 +848,16 @@ ui.randomize.addEventListener('click', saveSettings);
 ui.reset.addEventListener('click', resetSettings);
 
 if (touchScreen) ui.drop.replaceChildren(bold('Tap to choose an image'));
+else ui.drop.replaceChildren(bold('Choose an image'), `, drop one here, or paste with ${PASTE_KEY}`);
 // Where the browser can draw sub-pixel text, real screenshots from the same computer usually have it too.
 if (subpixelTextSupported()) ui.smoothing.querySelector('[value=subpixel]').defaultSelected = true;
 else ui.smoothing.closest('.field').hidden = true;
 restoreSettings();
+// Without CSS zoom, the export copy cannot be laid out at 2x or 3x.
+if (!CSS.supports('zoom', '2')) {
+  for (const option of ui.scale.options) option.disabled = option.value !== '1';
+  ui.scale.value = '1';
+}
 ui.direction.closest('.more').open = ui.direction.value !== defaultOf(ui.direction);
 if (ui.autoRandomize.checked) randomizePadding();
 else render();

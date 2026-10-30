@@ -50,9 +50,9 @@ after(async () => {
   server.close();
 });
 
-async function open(screen = DESKTOP, { keepStorage = false } = {}) {
+async function open(screen = DESKTOP, { keepStorage = false, pixelRatio = 1 } = {}) {
   const { width, height, mobile } = screen;
-  await send('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor: 1, mobile });
+  await send('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor: pixelRatio, mobile });
   await send('Emulation.setTouchEmulationEnabled', { enabled: mobile, maxTouchPoints: mobile ? 5 : 1 });
   await send('Emulation.setEmulatedMedia', {
     features: mobile ? [{ name: 'hover', value: 'none' }, { name: 'pointer', value: 'coarse' }] : [],
@@ -161,6 +161,46 @@ test('the empty preview opens the file chooser on desktops and phones', async ()
   assert.equal(fileChoosers, 0);
 });
 
+test('the picker names the paste keys of the computer', async () => {
+  await open();
+  assert.match(await evaluate('ui.drop.textContent'), /paste with Ctrl\+V/);
+  const { userAgent } = await send('Browser.getVersion');
+  await send('Emulation.setUserAgentOverride', { userAgent, platform: 'MacIntel', userAgentMetadata: {
+    platform: 'macOS', platformVersion: '15.0.0', architecture: 'arm', model: '', mobile: false } });
+  try {
+    await open();
+    assert.match(await evaluate('ui.drop.textContent'), /paste with ⌘V/);
+    assert.match(await evaluate(`document.querySelector('.placeholder').textContent`), /paste with ⌘V/);
+  } finally {
+    await send('Emulation.setUserAgentOverride', { userAgent, platform: '' });
+  }
+});
+
+test('a file that is not an image, or cannot be read, gets a message', async () => {
+  await open();
+  for (const type of ['text/plain', '']) {
+    await evaluate(`loadFile(new File(['x'], 'notes', { type: '${type}' }))`);
+    assert.match(await evaluate('ui.status.textContent'), /^That file is not an image\./);
+  }
+  await evaluate(`loadFile(new File(['not really'], 'photo.heic', { type: 'image/heic' }))`);
+  await until(`ui.status.textContent.startsWith('Could not read that image.')`);
+  assert.equal(await evaluate('source'), null);
+});
+
+test('a contrast theme does not change the download', async () => {
+  await open();
+  await loadImage(800, 600);
+  await evaluate(`paddingInputs.forEach(input => { input.value = '10'; })`);
+  const normal = await exportImage(2);
+  await send('Emulation.setEmulatedMedia', { features: [{ name: 'forced-colors', value: 'active' }] });
+  try {
+    assert.equal(await evaluate(`matchMedia('(forced-colors: active)').matches`), true);
+    assert.equal(await exportImage(2), normal);
+  } finally {
+    await send('Emulation.setEmulatedMedia', { features: [] });
+  }
+});
+
 test('file names keep letters of any script and end at a word', async () => {
   await open();
   const names = await evaluate(`[
@@ -260,6 +300,20 @@ test('on a phone, a wide box fits the screen and a tap shows it at full size', a
 
   await tap('#shot');
   assert.ok(await zoom() < 1);
+});
+
+test('a download is the same from screens of any pixel ratio', async () => {
+  const downloads = async pixelRatio => {
+    await open(PHONE, { pixelRatio });
+    await loadImage(1600, 1200);
+    await evaluate(`paddingInputs.forEach(input => { input.value = '10'; }); ui.smoothing.value = 'grayscale'`);
+    await setWidth(300);
+    return [await exportImage(1), await exportImage(2), await exportImage(3)];
+  };
+  const reference = await downloads(1);
+  for (const pixelRatio of [1.5, 2.625, 3]) {
+    assert.deepEqual(await downloads(pixelRatio), reference, `pixel ratio ${pixelRatio}`);
+  }
 });
 
 test('on a desktop, the preview stays in view when it fits the window', async () => {

@@ -46,9 +46,18 @@ of the text. Without this step, punctuation in a Hebrew caption moves to the wro
 A 2x download must look like a screenshot from a 2x screen. A 1x layout that is scaled up is different. Fonts have
 different hinting at different sizes. Borders align to device pixels. Line breaks can move.
 
-The export makes a hidden copy of the preview with CSS `zoom = scale / devicePixelRatio`. Chrome multiplies `zoom`
-and the device pixel ratio into one layout factor. Thus, on a 1x screen, a zoom of 2 gives the same layout and pixel
-alignment as a 2x screen. The result is identical to an export from a real 2x screen.
+The export makes a hidden copy of the preview with CSS `zoom` equal to the scale, and reads the layout of the copy.
+On a 1x screen, a zoom of 2 gives the same layout and pixel alignment as a 2x screen. The comparisons with real
+Wikipedia figures use this case.
+
+An earlier version used `zoom = scale / devicePixelRatio`, so that the zoom and the pixel ratio together gave the
+scale. This failed on every screen that is not 1x. With a zoom below 1, or between whole numbers, browsers round
+border widths to a different number of pixels. A 2x download from a 3x phone was 4px wider and taller than from a 1x
+screen, and a 1x download from a 2x screen was 4px wider. A zoom that is a whole number gives the same layout at all
+pixel ratios. With `zoom = scale`, the downloads in Chrome and Firefox are identical at pixel ratios of 1, 1.25, 1.5,
+1.6, 2, 2.625 and 3. In WebKit, they are identical at 1 and 2, and the 2x download is identical at 3. In the other
+WebKit cases, a download can be 1 to 4px smaller than from a 1x screen. Fractional ratios occur with operating system
+scaling and browser zoom.
 
 Firefox rounds the `88.4%` font size of the caption after it applies the zoom. A screen with a higher pixel density
 rounds the font size before. Thus the copy uses the rounded font size of the preview.

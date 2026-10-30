@@ -84,7 +84,12 @@ fieldset .check { margin-bottom: 8px; }
   .preview.sticky { position: sticky; top: 0; }
 }
 .shot.zoomable { cursor: pointer; }
-.shot { width: max-content; background: #fff; outline: 1px dashed var(--border); }
+/* The export reads colours and font sizes from this layout, so contrast themes and phone text enlargement must not
+   change them. */
+.shot {
+  width: max-content; background: #fff; outline: 1px dashed var(--border);
+  forced-color-adjust: none; -webkit-text-size-adjust: 100%; text-size-adjust: 100%;
+}
 .export-layout { position: fixed; left: 0; top: 0; visibility: hidden; }
 
 /* Recreates Wikipedia's Vector 2022 thumbnail. .page stands in for the article body, and restores
